@@ -9,21 +9,36 @@
  */
 namespace arabcoders\errors\Interfaces;
 
-use arabcoders\errors\Logging\Interfaces\LoggingInterface;
-use arabcoders\errors\Output\Interfaces\OutputInterface;
+use arabcoders\errors\
+{
+    Output\Interfaces\OutputInterface,
+    Logging\Interfaces\LoggingInterface
+};
 
 interface ErrorInterface
 {
-    CONST TYPE_ERROR     = 0;
+    /**
+     * @var int Type Error.
+     */
+    const TYPE_ERROR = 0;
+
+    /**
+     * @var int Type Exception.
+     */
     const TYPE_EXCEPTION = 1;
 
-    CONST ERROR_CODES = [
+    /**
+     * @var array All PHP Core Errors.
+     */
+    const ERROR_CODES = [
         E_ERROR             => 'E_ERROR',
-        E_CORE_ERROR        => 'E_CORE_ERROR',
-        E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
+        E_WARNING           => 'E_WARNING',
         E_PARSE             => 'E_PARSE',
+        E_NOTICE            => 'E_NOTICE',
+        E_CORE_ERROR        => 'E_CORE_ERROR',
         E_CORE_WARNING      => 'E_CORE_WARNING',
-        E_CORE_WARNING      => 'E_COMPILE_WARNING',
+        E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
+        E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
         E_USER_ERROR        => 'E_USER_ERROR',
         E_USER_WARNING      => 'E_USER_WARNING',
         E_USER_NOTICE       => 'E_USER_NOTICE',
@@ -31,8 +46,18 @@ interface ErrorInterface
         E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
         E_DEPRECATED        => 'E_DEPRECATED',
         E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
-        E_NOTICE            => 'E_NOTICE',
-        E_WARNING           => 'E_WARNING',
+    ];
+
+    /**
+     * @var array Fatal Errors
+     */
+    const FATAL_ERRORS = [
+        E_ERROR,
+        E_PARSE,
+        E_CORE_ERROR,
+        E_CORE_WARNING,
+        E_COMPILE_ERROR,
+        E_COMPILE_WARNING
     ];
 
     /**
@@ -116,36 +141,32 @@ interface ErrorInterface
     public function handleException( \Throwable $exception ) : ErrorInterface;
 
     /**
-     * Process Fetal And normal Errors.
+     * Process Fetal & normal Errors.
      *
-     * @param int    $number
-     * @param string $text
-     * @param string $file
-     * @param int    $line
+     * @param ErrorMapInterface $error
      *
      * @return ErrorInterface
      */
-    public function handleError( int $number, string $text, string $file, int $line ) : ErrorInterface;
+    public function handleError( ErrorMapInterface $error ) : ErrorInterface;
 
     /**
-     * Register Specific Handler for special kind of error to be processed separately.
+     * Register Specific Handler for special kind of Exception or error.
      *
-     * @param int                  $number
-     * @param SpecialCaseInterface $handler
-     *
-     * @return ErrorInterface
-     */
-    public function specialCaseError( int $number, SpecialCaseInterface $handler ) : ErrorInterface;
-
-    /**
-     * Register Specific Handler for special kind of Exception to be processed separately.
-     *
+     * @param string|int           $parameter className or Error Number.
      * @param string               $name
      * @param SpecialCaseInterface $handler
      *
      * @return ErrorInterface
      */
-    public function specialCaseException( string $name, SpecialCaseInterface $handler ) : ErrorInterface;
+    public function addSpecialCase( $parameter, string $name, SpecialCaseInterface $handler ) : ErrorInterface;
+
+    /**
+     * @param string|int $parameter class Name or Error Number.
+     * @param string     $name
+     *
+     * @return ErrorInterface
+     */
+    public function deleteSpecialCase( $parameter, string $name ) : ErrorInterface;
 
     /**
      * Register Logger.
@@ -155,7 +176,7 @@ interface ErrorInterface
      *
      * @return ErrorInterface
      */
-    public function registerLogger( string $name, LoggingInterface $logger ) : ErrorInterface;
+    public function addLogger( string $name, LoggingInterface $logger ) : ErrorInterface;
 
     /**
      * Remove Logger.
@@ -164,7 +185,7 @@ interface ErrorInterface
      *
      * @return ErrorInterface
      */
-    public function removeLogger( string $name ) : ErrorInterface;
+    public function deleteLogger( string $name ) : ErrorInterface;
 
     /**
      * Set Map.
@@ -181,4 +202,24 @@ interface ErrorInterface
      * @return MapInterface
      */
     public function getMap() : MapInterface;
+
+    /**
+     * Add Policy.
+     *
+     * @param string          $name
+     * @param PolicyInterface $policy
+     *
+     * @return ErrorInterface
+     */
+    public function addPolicy( string $name, PolicyInterface $policy ) : ErrorInterface;
+
+    /**
+     * Delete Policy.
+     *
+     * @param string|int $parameter
+     * @param string     $name
+     *
+     * @return ErrorInterface
+     */
+    public function deletePolicy( $parameter, string $name ) : ErrorInterface;
 }

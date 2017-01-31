@@ -9,14 +9,13 @@
  */
 namespace arabcoders\errors;
 
-use arabcoders\errors\Interfaces\FormatterInterface,
-    arabcoders\errors\Interfaces\SpecialCaseInterface,
-    arabcoders\errors\Interfaces\ErrorInterface,
-    arabcoders\errors\Interfaces\StructuredInterface,
-    arabcoders\errors\Interfaces\TracerInterface,
-    arabcoders\errors\Output\Interfaces\OutputInterface,
-    arabcoders\errors\Logging\Interfaces\LoggingInterface,
-    arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\
+{
+    Interfaces\ErrorMapInterface, Interfaces\FormatterInterface, Interfaces\SpecialCaseInterface,
+    Interfaces\ErrorInterface, Interfaces\StructuredInterface, Interfaces\TracerInterface,
+    Output\Interfaces\OutputInterface, Logging\Interfaces\LoggingInterface, Interfaces\MapInterface,
+    Interfaces\PolicyInterface
+};
 
 class Error implements ErrorInterface
 {
@@ -59,6 +58,11 @@ class Error implements ErrorInterface
     private $map;
 
     /**
+     * @var PolicyInterface[][]
+     */
+    private $policies;
+
+    /**
      * Error constructor.
      *
      * @param array $options
@@ -67,7 +71,7 @@ class Error implements ErrorInterface
     {
         $this->setTracer( new Tracer() )
              ->setFormatter( new Formatter() )
-             ->registerLogger( 'syslog', new Logging\Syslog() )
+             ->addLogger( Logging\Syslog::class, new Logging\Syslog() )
              ->setOutput( new Output\Basic() )
              ->setStructured( new Structured() )
              ->setMap( new Map() );
@@ -137,19 +141,19 @@ class Error implements ErrorInterface
     {
         set_error_handler( function ( int $number, string $text, string $file, int $line )
         {
-            $this->handleError( $number, $text, $file, $line );
+            $this->handleError( new ErrorMap( $number, $text, $file, $line ) );
         } );
 
         register_shutdown_function( function ()
         {
             $error = error_get_last();
 
-            if ( null == $error )
+            if ( null == $error || !in_array( $error['type'], self::FATAL_ERRORS ) )
             {
                 return;
             }
 
-            $this->handleError( (int) $error['type'], (string) $error['message'], (string) $error['file'], (int) $error['line'] );
+            $this->handleError( new ErrorMap( (int) $error['type'], (string) $error['message'], (string) $error['file'], (int) $error['line'] ) );
         } );
 
         set_exception_handler( function ( \Throwable $exception )
@@ -160,9 +164,13 @@ class Error implements ErrorInterface
         return $this;
     }
 
-    public function handleError( int $number, string $text, string $file, int $line ) : ErrorInterface
+    public function handleError( ErrorMapInterface $error ) : ErrorInterface
     {
-        $error = new ErrorMap( $number, $text, $file, $line );
+        // error was suppressed with the @-operator
+        if ( 0 === error_reporting() && !in_array( $error->getNumber(), self::FATAL_ERRORS ) )
+        {
+            return $this;
+        }
 
         $this->getMap()
              ->clear()
@@ -173,20 +181,16 @@ class Error implements ErrorInterface
              ->setError( $error )
              ->getInstance();
 
-        if ( array_key_exists( $number, $this->specialCases ) )
+        if ( array_key_exists( $error->getNumber(), $this->specialCases ) )
         {
             /** @var SpecialCaseInterface $handler */
-            foreach ( $this->specialCases[$number] as $handler )
+            foreach ( $this->specialCases[$error->getNumber()] as $handler )
             {
                 $handler->setMap( $this->getMap() )->handle();
             }
         }
 
-        $this->log();
-
-        $this->getOutput()
-             ->setMap( $this->getMap() )
-             ->display();
+        $this->handleState();
 
         return $this;
     }
@@ -212,72 +216,125 @@ class Error implements ErrorInterface
             }
         }
 
-        $this->log();
-
-        $this->getOutput()
-             ->setMap( $this->getMap() )
-             ->display();
+        $this->handleState();
 
         return $this;
     }
 
-    public function specialCaseException( string $name, SpecialCaseInterface $handler ) : ErrorInterface
+    public function addSpecialCase( $parameter, string $name, SpecialCaseInterface $handler ) : ErrorInterface
     {
-        $className = get_class( $handler );
-
-        if ( !array_key_exists( $name, $this->specialCases ) )
+        if ( !array_key_exists( $parameter, $this->specialCases ) )
         {
-            $this->specialCases[$name] = [];
+            $this->specialCases[$parameter] = [];
         }
 
-        if ( array_key_exists( $className, $this->specialCases[$name] ) )
-        {
-            throw new \InvalidArgumentException( sprintf( '(%s) class already registered to handle (%s) Exception.', $className, $name ) );
-        }
-
-        $this->specialCases[$name][$className] = $handler;
+        $this->specialCases[$parameter][$name] = $handler;
 
         return $this;
     }
 
-    public function specialCaseError( int $number, SpecialCaseInterface $handler ) : ErrorInterface
+    public function deleteSpecialCase( $parameter, string $name ) : ErrorInterface
     {
-        $className = get_class( $handler );
-
-        if ( !array_key_exists( $number, $this->specialCases ) )
+        if ( !array_key_exists( $parameter, $this->specialCases ) )
         {
-            $this->specialCases[$number] = [];
+            throw new \InvalidArgumentException( sprintf( '(%s) has no specialCases Registerd.', $parameter ) );
         }
 
-        if ( array_key_exists( $className, $this->specialCases[$number] ) )
+        if ( !array_key_exists( $name, $this->specialCases[$parameter] ) )
         {
-            throw new \InvalidArgumentException( sprintf( '(%s) class already registered to handle (%s) errors.', $className, self::ERROR_CODES[$number] ) );
+            throw new \InvalidArgumentException( sprintf( '(%s) has no registered specialCases of name (%s).', $parameter, $name ) );
         }
 
-        $this->specialCases[$number][$className] = $handler;
+        unset( $this->specialCases[$parameter][$name] );
 
         return $this;
     }
 
-    public function registerLogger( string $name, LoggingInterface $logger ) : ErrorInterface
+    public function addLogger( string $name, LoggingInterface $logger ) : ErrorInterface
     {
         $this->loggingServices[$name] = $logger;
 
         return $this;
     }
 
-    public function removeLogger( string $name ) : ErrorInterface
+    public function deleteLogger( string $name ) : ErrorInterface
     {
         if ( array_key_exists( $name, $this->loggingServices ) )
         {
-            unset( $this->loggingServices[$name] );
+            throw new \InvalidArgumentException( sprintf( 'No Logger Service of name (%s) registered.', $name ) );
         }
+
+        unset( $this->loggingServices[$name] );
 
         return $this;
     }
 
-    private function log() : ErrorInterface
+    public function addPolicy( string $name, PolicyInterface $policy ) : ErrorInterface
     {
+        $this->policies[$policy->getParameter()][$name] = $policy;
+
+        return $this;
+    }
+
+    public function deletePolicy( $parameter, string $name ) : ErrorInterface
+    {
+
+        if ( !array_key_exists( $parameter, $this->policies ) )
+        {
+            throw new \InvalidArgumentException( sprintf( '(%s) has no registered Policies.', $parameter ) );
+        }
+
+        if ( !array_key_exists( $name, $this->policies[$parameter] ) )
+        {
+            throw new \InvalidArgumentException( sprintf( '(%s) has no registered Policy of name (%s).', $parameter, $name ) );
+        }
+
+        unset( $this->policies[$parameter][$name] );
+
+        return $this;
+    }
+
+    /**
+     * Handle Logging, displaying and exiting of the program.
+     */
+    private function handleState()
+    {
+        if ( $this->getMap()->getType() === self::TYPE_ERROR )
+        {
+            $parameter = $this->getMap()->getError()->getNumber();
+        }
+        else
+        {
+
+            $parameter = get_class( $this->getMap()->getException() );
+        }
+
+        $this->log( $parameter );
+        $this->display( $parameter );
+        $this->exit( $parameter );
+    }
+
+    /**
+     * Log Error.
+     *
+     * @param string|int $parameter
+     *
+     * @return ErrorInterface
+     */
+    private function log( $parameter ) : ErrorInterface
+    {
+
+        if ( array_key_exists( $parameter, $this->policies ) )
+        {
+            foreach ( $this->policies[$parameter] as $policy )
+            {
+                if ( !$policy->allowLogging() )
+                {
+                    return $this;
+                }
+            }
+        }
+
         foreach ( $this->loggingServices as $serviceName => $logger )
         {
             $logger->clear()
@@ -286,5 +343,57 @@ class Error implements ErrorInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Display Error.
+     *
+     * @param string|int $parameter
+     *
+     * @return ErrorInterface
+     */
+    private function display( $parameter ) : ErrorInterface
+    {
+
+        if ( array_key_exists( $parameter, $this->policies ) )
+        {
+            foreach ( $this->policies[$parameter] as $policy )
+            {
+                if ( !$policy->allowDisplaying() )
+                {
+                    return $this;
+                }
+            }
+        }
+
+        $this->getOutput()
+             ->setMap( $this->getMap() )
+             ->display();
+
+        return $this;
+    }
+
+    /**
+     * Exit Program On Failure.
+     *
+     * @param string|int $parameter
+     *
+     * @return ErrorInterface
+     */
+    private function exit( $parameter ) : ErrorInterface
+    {
+
+        if ( array_key_exists( $parameter, $this->policies ) )
+        {
+            foreach ( $this->policies[$parameter] as $policy )
+            {
+                if ( !$policy->allowExiting() )
+                {
+                    return $this;
+                }
+            }
+        }
+
+        exit( 1 );
     }
 }
