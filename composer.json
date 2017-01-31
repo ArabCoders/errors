@@ -16,8 +16,13 @@
             "email": "admin@arabcoders.org"
         }
     ],
+    "suggest": {
+        "guzzleHttp/guzzle": "For Remote Logging",
+        "twigphp/twig": "For Twig output."
+    },
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.0",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
