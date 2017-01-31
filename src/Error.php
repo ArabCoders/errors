@@ -24,57 +24,61 @@ class Error implements ErrorInterface
      *
      * @var array
      */
-    private $specialCases = [];
+    protected $specialCases = [];
 
     /**
      * Holds instances of logging services.
      *
      * @var LoggingInterface[]
      */
-    private $loggingServices = [];
+    protected $loggingServices = [];
 
     /**
      * @var FormatterInterface
      */
-    private $formatter;
+    protected $formatter;
 
     /**
      * @var TracerInterface
      */
-    private $tracer;
+    protected $tracer;
     /**
      * @var StructuredInterface
      */
-    private $structured;
+    protected $structured;
 
     /**
      * @var OutputInterface
      */
-    private $output;
+    protected $output;
 
     /**
      * @var MapInterface
      */
-    private $map;
+    protected $map;
 
     /**
      * @var PolicyInterface[][]
      */
-    private $policies;
+    protected $policies;
 
     /**
      * Error constructor.
      *
+     * @param bool  $default
      * @param array $options
      */
-    public function __construct( array $options = [] )
+    public function __construct( bool $default = false, array $options = [] )
     {
-        $this->setTracer( new Tracer() )
+        $this->setMap( new Map() )
+             ->setTracer( new Tracer() )
              ->setFormatter( new Formatter() )
-             ->addLogger( Logging\Syslog::class, new Logging\Syslog() )
-             ->setOutput( new Output\Basic() )
-             ->setStructured( new Structured() )
-             ->setMap( new Map() );
+             ->setStructured( new Structured() );
+
+        if ( $default )
+        {
+            $this->setupDefault();
+        }
     }
 
     public function setFormatter( FormatterInterface $formatter ) : ErrorInterface
@@ -122,6 +126,7 @@ class Error implements ErrorInterface
 
     public function getStructured() : StructuredInterface
     {
+
         return $this->structured;
     }
 
@@ -297,7 +302,7 @@ class Error implements ErrorInterface
     /**
      * Handle Logging, displaying and exiting of the program.
      */
-    private function handleState()
+    protected function handleState()
     {
         if ( $this->getMap()->getType() === self::TYPE_ERROR )
         {
@@ -321,7 +326,7 @@ class Error implements ErrorInterface
      *
      * @return ErrorInterface
      */
-    private function log( $parameter ) : ErrorInterface
+    protected function log( $parameter ) : ErrorInterface
     {
 
         if ( array_key_exists( $parameter, $this->policies ) )
@@ -352,7 +357,7 @@ class Error implements ErrorInterface
      *
      * @return ErrorInterface
      */
-    private function display( $parameter ) : ErrorInterface
+    protected function display( $parameter ) : ErrorInterface
     {
 
         if ( array_key_exists( $parameter, $this->policies ) )
@@ -380,7 +385,7 @@ class Error implements ErrorInterface
      *
      * @return ErrorInterface
      */
-    private function exit( $parameter ) : ErrorInterface
+    protected function exit( $parameter ) : ErrorInterface
     {
 
         if ( array_key_exists( $parameter, $this->policies ) )
@@ -395,5 +400,18 @@ class Error implements ErrorInterface
         }
 
         exit( 1 );
+    }
+
+    /**
+     * Setup Defaults.
+     *
+     * @return ErrorInterface
+     */
+    protected function setupDefault() : ErrorInterface
+    {
+        $this->addLogger( 'default', new Logging\Syslog() )
+             ->setOutput( ( ( 'cli' === PHP_SAPI ) ? new Output\CLI() : new Output\HTML() ) );
+
+        return $this;
     }
 }
