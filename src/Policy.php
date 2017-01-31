@@ -100,6 +100,11 @@ class Policy implements PolicyInterface
 
     public function getClosure() : \Closure
     {
+        if ( empty( $this->closure ) )
+        {
+            throw new \RuntimeException( 'Closure Is not defined.' );
+        }
+
         return $this->closure;
     }
 }
