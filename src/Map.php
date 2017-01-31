@@ -90,7 +90,7 @@ class Map implements MapInterface
     {
         $this->trace      = [];
         $this->structured = [];
-        $this->message    = [];
+        $this->message    = '';
 
         return $this;
     }
