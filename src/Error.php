@@ -60,7 +60,7 @@ class Error implements ErrorInterface
     /**
      * @var PolicyInterface[][]
      */
-    protected $policies;
+    protected $policies = [];
 
     /**
      * Error constructor.
