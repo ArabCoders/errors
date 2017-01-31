@@ -9,9 +9,10 @@
  */
 namespace arabcoders\errors\Output;
 
-use arabcoders\errors\Interfaces\ErrorInterface;
-use arabcoders\errors\Interfaces\MapInterface;
-use arabcoders\errors\Output\Interfaces\OutputInterface;
+use arabcoders\errors\
+{
+    Interfaces\ErrorInterface, Interfaces\MapInterface, Output\Interfaces\OutputInterface
+};
 
 class HTML implements OutputInterface
 {
@@ -50,8 +51,6 @@ class HTML implements OutputInterface
 
         $type = ( $this->getMap()->getType() == ErrorInterface::TYPE_ERROR ) ? 'Error' : 'Exception';
         print sprintf( $string, $type, htmlspecialchars( $this->getMap()->getMessage() ), $structured, $trace );
-
-        exit( 1 );
     }
 
     public function setMap( MapInterface $map ) : OutputInterface

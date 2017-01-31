@@ -9,8 +9,10 @@
  */
 namespace arabcoders\errors\Output;
 
-use arabcoders\errors\Interfaces\MapInterface;
-use arabcoders\errors\Output\Interfaces\OutputInterface;
+use arabcoders\errors\
+{
+    Interfaces\MapInterface, Output\Interfaces\OutputInterface
+};
 
 class CLI implements OutputInterface
 {
@@ -22,8 +24,6 @@ class CLI implements OutputInterface
     public function display()
     {
         fwrite( STDERR, $this->getMap()->getMessage() . PHP_EOL );
-
-        return '';
     }
 
     public function setMap( MapInterface $map ) : OutputInterface

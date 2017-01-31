@@ -20,7 +20,7 @@ use arabcoders\errors\Interfaces\MapInterface;
 Interface OutputInterface
 {
     /**
-     * Process Data for output or not.
+     * Process Error for output.
      */
     public function display();
 

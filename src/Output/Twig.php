@@ -9,10 +9,11 @@
  */
 namespace arabcoders\errors\Output;
 
-use arabcoders\errors\Interfaces\ErrorInterface;
-use arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\
+{
+    Interfaces\ErrorInterface, Interfaces\MapInterface, Output\Interfaces\OutputInterface
+};
 use Twig_Environment;
-use arabcoders\errors\Output\Interfaces\OutputInterface;
 
 /**
  * Class Twig
@@ -38,16 +39,7 @@ class Twig implements OutputInterface
     private $template;
 
     /**
-     * Twig constructor, it will provide 3 variables to twig named as the following.
-     * <code>
-     * [
-     *      'type'       => 'error kind',
-     *      'className'  => 'Exception name or null',
-     *      'message'    => 'the error message as string'
-     *      'trace'      => 'trace as json_encode string or null if empty',
-     *      'structured' => 'trace as json_encode string or null if empty',
-     * ]
-     * </code>
+     * Twig constructor,
      *
      * @param Twig_Environment $twig
      * @param string           $template
@@ -59,6 +51,18 @@ class Twig implements OutputInterface
         $this->template = $template;
     }
 
+    /**
+     * it will provide {@see Twig_Environment} with 5 variables named as the following.
+     * <code>
+     * [
+     *      'type'       => 'error kind',
+     *      'className'  => 'Exception name or null',
+     *      'message'    => 'the error message as string'
+     *      'trace'      => 'trace as json encoded string or null if empty',
+     *      'structured' => 'trace as json encoded string or null if empty',
+     * ]
+     * </code>
+     */
     public function display()
     {
         $trace = $this->getMap()->getTrace();
@@ -78,8 +82,6 @@ class Twig implements OutputInterface
             'trace'      => ( !empty( $trace ) ) ? json_encode( $trace, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
             'structured' => ( !empty( $structured ) ) ? json_encode( $structured, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
         ] );
-
-        exit( 1 );
     }
 
     public function setMap( MapInterface $map ) : OutputInterface
