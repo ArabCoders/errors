@@ -16,13 +16,13 @@ use arabcoders\errors\
 
 class Formatter implements FormatterInterface
 {
-    CONST ERROR_FORMAT = "(%s) in (%s:%d) with message (%s) URI: (%s:%s)";
+    CONST FORMAT_ERROR = "(%s) in (%s:%d) with message (%s) URI: (%s:%s)";
 
-    CONST EXCEPTION_FORMAT = "(%s) thrown in (%s:%d) %s URI: (%s:%s)";
+    CONST FORMAT_EXCEPTION = "(%s) thrown in (%s:%d) %s URI: (%s:%s)";
 
     public function formatError( ErrorMapInterface $map ) : string
     {
-        return sprintf( self::ERROR_FORMAT,
+        return sprintf( self::FORMAT_ERROR,
                         ErrorInterface::ERROR_CODES[$map->getNumber()] ?? $map->getNumber(),
                         $map->getFile(),
                         $map->getLine(),
@@ -34,7 +34,7 @@ class Formatter implements FormatterInterface
 
     public function formatException( \Throwable $e ) : string
     {
-        return sprintf( '%s: thrown in (%s:%s) %s URI: (%s:%s)',
+        return sprintf( self::FORMAT_EXCEPTION,
                         get_class( $e ),
                         $e->getFile(),
                         $e->getLine(),

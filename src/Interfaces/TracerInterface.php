@@ -17,6 +17,22 @@ namespace arabcoders\errors\Interfaces;
 interface TracerInterface
 {
     /**
+     * Set Root Path To strip from Trace.
+     *
+     * @param string $root
+     *
+     * @return TracerInterface
+     */
+    public function setRoot( string $root ) : TracerInterface;
+
+    /**
+     * Get Root Path.
+     *
+     * @return string
+     */
+    public function getRoot() : string;
+
+    /**
      * Set Debug Trace Context.
      *
      * @param array $context

@@ -1,7 +1,5 @@
 <?php
 
-namespace arabcoders\errors\tests\Policy;
-
 use arabcoders\errors\ErrorMap;
 use arabcoders\errors\Interfaces\ErrorInterface;
 use arabcoders\errors\Interfaces\ErrorMapInterface;
@@ -37,11 +35,11 @@ class MapTest extends \PHPUnit_Framework_TestCase
 
         $map->setType( ErrorInterface::TYPE_ERROR );
 
-        $this->assertEquals( false, $map->isException() );
+        $this->assertFalse( $map->isException() );
 
         $map->setType( ErrorInterface::TYPE_EXCEPTION );
 
-        $this->assertEquals( true, $map->isException() );
+        $this->assertTrue( $map->isException() );
     }
 
     public function testIsError()
@@ -50,11 +48,11 @@ class MapTest extends \PHPUnit_Framework_TestCase
 
         $map->setType( ErrorInterface::TYPE_EXCEPTION );
 
-        $this->assertEquals( false, $map->isError() );
+        $this->assertFalse( $map->isError() );
 
         $map->setType( ErrorInterface::TYPE_ERROR );
 
-        $this->assertEquals( true, $map->isError() );
+        $this->assertTrue( $map->isError() );
     }
 
     public function testSetTrace()

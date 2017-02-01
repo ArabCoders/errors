@@ -13,6 +13,11 @@ use arabcoders\errors\Interfaces\TracerInterface;
 
 class Tracer implements TracerInterface
 {
+    /**
+     * Formatted Trace Data.
+     *
+     * @var array
+     */
     private $trace = [];
 
     /**
@@ -23,9 +28,30 @@ class Tracer implements TracerInterface
     private $context = [];
 
     /**
+     * Files to Ignore From Trace.
+     *
      * @var array
      */
     private $ignore = [];
+
+    /**
+     * Root Path to remove from File path.
+     *
+     * @var string
+     */
+    private $root = '';
+
+    public function setRoot( string $root ) : TracerInterface
+    {
+        $this->root = $root;
+
+        return $this;
+    }
+
+    public function getRoot() : string
+    {
+        return $this->root;
+    }
 
     public function setIgnore( array $files ) : TracerInterface
     {
@@ -59,7 +85,7 @@ class Tracer implements TracerInterface
             $tracer = $e->getTrace();
         }
 
-        $path = realpath( __DIR__ . '/../../' );
+        $path = ( $this->getRoot() ) ? realpath( $this->getRoot() ) : '';
 
         foreach ( $tracer as $number => $trace )
         {
@@ -68,16 +94,19 @@ class Tracer implements TracerInterface
                 continue;
             }
 
-            // Strip the current directory from path..
-            $trace['file'] = str_replace( [ $path, '\\' ], [ '', '/' ], $trace['file'] );
-            $trace['file'] = substr( $trace['file'], 1 );
-
             foreach ( $this->ignore as $file )
             {
                 if ( stripos( $file, $trace['file'] ) !== false )
                 {
                     continue 2;
                 }
+            }
+
+            // Strip the Root Path from Trace file.
+            if ( !empty( $path ) )
+            {
+                $trace['file'] = str_replace( [ $path, '\\' ], [ '', '/' ], $trace['file'] );
+                $trace['file'] = substr( $trace['file'], 1 );
             }
 
             $args = [];
@@ -94,9 +123,13 @@ class Tracer implements TracerInterface
                 if ( !empty( $trace['args'][0] ) )
                 {
                     $argument = htmlspecialchars( $trace['args'][0] );
-                    $argument = str_replace( [ $path, '\\' ], [ '', '/' ], $argument );
-                    $argument = substr( $argument, 1 );
-                    $args[]   = "'{$argument}'";
+                    // Strip the Root Path from Trace file.
+                    if ( !empty( $path ) )
+                    {
+                        $argument = str_replace( [ $path, '\\' ], [ '', '/' ], $argument );
+                        $argument = substr( $argument, 1 );
+                    }
+                    $args[] = "'{$argument}'";
                 }
             }
 
@@ -123,6 +156,7 @@ class Tracer implements TracerInterface
         $this->context = [];
         $this->trace   = [];
         $this->ignore  = [];
+        $this->root    = '';
 
         return $this;
     }

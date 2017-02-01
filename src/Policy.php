@@ -63,7 +63,7 @@ class Policy implements PolicyInterface
         $this->closure    = $closure;
     }
 
-    public function isOfType( int $type ) : int
+    public function isOfType( int $type ) : bool
     {
         return $this->getType() === $type;
     }

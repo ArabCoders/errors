@@ -33,9 +33,9 @@ interface PolicyInterface
      *
      * @param int $type {@see ErrorInterface::TYPE_ERROR} or {@see ErrorInterface::TYPE_EXCEPTION}
      *
-     * @return int
+     * @return bool
      */
-    public function isOfType( int $type ) : int;
+    public function isOfType( int $type ) : bool;
 
     /**
      * Get Error Type.
