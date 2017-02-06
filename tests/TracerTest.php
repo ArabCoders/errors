@@ -2,7 +2,7 @@
 
 use arabcoders\errors\Tracer;
 
-class TracerTest extends \PHPUnit_Framework_TestCase
+class TracerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Tracer

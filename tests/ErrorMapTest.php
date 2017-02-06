@@ -2,7 +2,7 @@
 
 use arabcoders\errors\ErrorMap;
 
-class ErrorMapTest extends \PHPUnit_Framework_TestCase
+class ErrorMapTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ErrorMap

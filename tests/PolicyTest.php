@@ -2,7 +2,7 @@
 
 use arabcoders\errors\Policy;
 
-class PolicyClosureTest extends \PHPUnit_Framework_TestCase
+class PolicyClosureTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Policy

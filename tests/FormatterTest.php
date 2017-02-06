@@ -4,7 +4,7 @@ use arabcoders\errors\ErrorMap;
 use arabcoders\errors\Formatter;
 use arabcoders\errors\Interfaces\ErrorInterface;
 
-class FormatterTest extends \PHPUnit_Framework_TestCase
+class FormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Formatter

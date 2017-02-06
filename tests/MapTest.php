@@ -5,7 +5,7 @@ use arabcoders\errors\Interfaces\ErrorInterface;
 use arabcoders\errors\Interfaces\ErrorMapInterface;
 use arabcoders\errors\Map;
 
-class MapTest extends \PHPUnit_Framework_TestCase
+class MapTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

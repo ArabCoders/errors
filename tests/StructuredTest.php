@@ -4,7 +4,7 @@ use arabcoders\errors\ErrorMap;
 use arabcoders\errors\Interfaces\ErrorInterface;
 use arabcoders\errors\Structured;
 
-class StructuredTest extends \PHPUnit_Framework_TestCase
+class StructuredTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Structured
