@@ -242,7 +242,7 @@ class Error implements ErrorInterface
     {
         if ( !array_key_exists( $parameter, $this->specialCases ) )
         {
-            throw new \InvalidArgumentException( sprintf( '(%s) has no specialCases Registerd.', $parameter ) );
+            throw new \InvalidArgumentException( sprintf( '(%s) has no specialCases Registered.', $parameter ) );
         }
 
         if ( !array_key_exists( $name, $this->specialCases[$parameter] ) )
@@ -264,7 +264,7 @@ class Error implements ErrorInterface
 
     public function deleteLogger( string $name ) : ErrorInterface
     {
-        if ( array_key_exists( $name, $this->loggingServices ) )
+        if ( !array_key_exists( $name, $this->loggingServices ) )
         {
             throw new \InvalidArgumentException( sprintf( 'No Logger Service of name (%s) registered.', $name ) );
         }
