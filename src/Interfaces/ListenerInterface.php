@@ -11,25 +11,25 @@
 namespace arabcoders\errors\Interfaces;
 
 /**
- * Interface SpecialCaseInterface
+ * Interface ListenerInterface
  *
  * @package arabcoders\errors\Interfaces
  */
-Interface SpecialCaseInterface
+Interface ListenerInterface
 {
     /**
-     * Handle The expection or error provided by the map
+     * Handle the exception or error
      */
     public function handle();
 
     /**
      * Set Map.
      *
-     * @param MapInterface $map
+     * @param MapInterface $map Map class.
      *
-     * @return SpecialCaseInterface
+     * @return ListenerInterface
      */
-    public function setMap( MapInterface $map ) : SpecialCaseInterface;
+    public function setMap( MapInterface $map ) : ListenerInterface;
 
     /**
      * Get Map.
