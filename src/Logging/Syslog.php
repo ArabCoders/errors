@@ -9,10 +9,9 @@
  */
 namespace arabcoders\errors\Logging;
 
-use arabcoders\errors\
-{
-    Interfaces\ErrorInterface, Interfaces\MapInterface, Logging\Interfaces\LoggingInterface
-};
+use arabcoders\errors\Interfaces\ErrorInterface;
+use arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\Logging\Interfaces\LoggingInterface;
 
 /**
  * Class Syslog
@@ -22,17 +21,17 @@ use arabcoders\errors\
 class Syslog implements LoggingInterface
 {
     /**
-     * @var MapInterface
+     * @var MapInterface Map class.
      */
     private $map;
 
     /**
-     * @var bool
+     * @var bool whether syslog function exists.
      */
     private $syslog;
 
     /**
-     * @var array Map PHP Errors to syslog.
+     * @var array Map PHP errors to syslog.
      */
     private $logMap = [
         E_ERROR             => LOG_ERR,
@@ -51,19 +50,31 @@ class Syslog implements LoggingInterface
         E_DEPRECATED        => LOG_DEBUG,
     ];
 
-    public function __construct( $appName = 'PHPErrors' )
+    /**
+     * Syslog constructor.
+     *
+     * @param string $appName  App name.
+     * @param int    $option   The option argument is used to indicate what logging options will be used when generating a log message.
+     * @param int    $facility he facility argument is used to specify what type of program is logging the message. This allows you to
+     *                         specify (in your machine's syslog configuration) how messages coming from different facilities will be
+     *                         handled.
+     */
+    public function __construct( $appName = 'PHPErrors', $option = \LOG_PID, $facility = \LOG_USER )
     {
         if ( function_exists( 'openlog' ) )
         {
-            openlog( $appName, \LOG_PID, \LOG_USER );
+            openlog( $appName, $option, $facility );
         }
 
         $this->syslog = function_exists( 'syslog' );
     }
 
+    /**
+     * Process data to log.
+     */
     public function process() : LoggingInterface
     {
-        if ( !function_exists( 'syslog' ) )
+        if ( !$this->syslog )
         {
             throw new \RuntimeException( 'syslog(): function does not exists' );
         }
@@ -94,6 +105,11 @@ class Syslog implements LoggingInterface
         return $this;
     }
 
+    /**
+     * Clear log data.
+     *
+     * @return LoggingInterface
+     */
     public function clear() : LoggingInterface
     {
         $this->map = null;
@@ -101,6 +117,13 @@ class Syslog implements LoggingInterface
         return $this;
     }
 
+    /**
+     * Set map.
+     *
+     * @param MapInterface $map Map class.
+     *
+     * @return LoggingInterface
+     */
     public function setMap( MapInterface $map ) : LoggingInterface
     {
         $this->map = $map;
@@ -108,6 +131,11 @@ class Syslog implements LoggingInterface
         return $this;
     }
 
+    /**
+     * Get map.
+     *
+     * @return MapInterface
+     */
     public function getMap() : MapInterface
     {
         return $this->map;

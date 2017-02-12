@@ -19,36 +19,33 @@ use arabcoders\errors\Logging\Interfaces\LoggingInterface;
  */
 class File implements LoggingInterface
 {
-    private $message = '';
-
-    private $trace = [];
-
-    private $structured = [];
-
     /**
-     * @var resource
+     * @var resource active handler to a file.
      */
     private $fp;
 
     /**
-     * @var MapInterface
+     * @var MapInterface Map class.
      */
     private $map;
 
     /**
      * File constructor.
      *
-     * @param string $file
-     * @param string $mode
+     * @param string $file filename including path to open for writing
+     * @param string $mode mode to open file in defaults to ( <u><b>ab</b></u> ).
      */
     public function __construct( $file, string $mode = 'ab' )
     {
-        if ( !( $this->fp = fopen( $file, $mode ) ) )
+        if ( !( $this->fp = @fopen( $file, $mode ) ) )
         {
             throw new \InvalidArgumentException( sprintf( 'Unable to open (%s) for writing', $file ) );
         }
     }
 
+    /**
+     * Process data to log.
+     */
     public function process() : LoggingInterface
     {
         $message = trim( '[' . gmdate( \DateTime::W3C ) . '] ' . $this->getMap()->getMessage() );
@@ -64,7 +61,10 @@ class File implements LoggingInterface
 
         foreach ( $trace as $row )
         {
-            $message .= sprintf( 'FILE: %s' . PHP_EOL . 'LINE: %s' . PHP_EOL . 'CALL: %s' . PHP_EOL . '----------------------------' . PHP_EOL,
+            $message .= sprintf( 'FILE: %s' . PHP_EOL .
+                                 'LINE: %s' . PHP_EOL .
+                                 'CALL: %s' . PHP_EOL .
+                                 '----------------------------' . PHP_EOL,
                                  $row['file'], $row['line'], $row['call']
             );
         }
@@ -74,28 +74,43 @@ class File implements LoggingInterface
             $message .= 'End of Trace' . PHP_EOL . '----------------------------';
         }
 
-        fwrite( $this->fp, $message . PHP_EOL );
+        fwrite( $this->fp, trim( $message ) . PHP_EOL );
 
         return $this;
     }
 
+    /**
+     * Clear log data.
+     *
+     * @return LoggingInterface
+     */
     public function clear() : LoggingInterface
     {
-        $this->message    = '';
-        $this->trace      = [];
-        $this->structured = [];
+        $this->map = null;
 
         return $this;
     }
 
+    /**
+     * Free resources and close file handlers.
+     */
     public function __destruct()
     {
         if ( is_resource( $this->fp ) )
         {
             fclose( $this->fp );
         }
+
+        $this->map = null;
     }
 
+    /**
+     * Set map.
+     *
+     * @param MapInterface $map Map class.
+     *
+     * @return LoggingInterface
+     */
     public function setMap( MapInterface $map ) : LoggingInterface
     {
         $this->map = $map;
@@ -103,6 +118,11 @@ class File implements LoggingInterface
         return $this;
     }
 
+    /**
+     * Get map.
+     *
+     * @return MapInterface
+     */
     public function getMap() : MapInterface
     {
         return $this->map;

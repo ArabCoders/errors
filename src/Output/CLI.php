@@ -9,23 +9,45 @@
  */
 namespace arabcoders\errors\Output;
 
-use arabcoders\errors\
-{
-    Interfaces\MapInterface, Output\Interfaces\OutputInterface
-};
+use arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\Output\Interfaces\OutputInterface;
 
+/**
+ * Class CLI
+ *
+ * @package arabcoders\errors\Output
+ */
 class CLI implements OutputInterface
 {
     /**
-     * @var MapInterface
+     * @var MapInterface Map class.
      */
     private $map;
 
-    public function display()
+    /**
+     * Process data for output.
+     *
+     * @return OutputInterface
+     */
+    public function display() : OutputInterface
     {
+        if ( !is_resource( STDERR ) )
+        {
+            define( 'STDERR', fopen( 'php://stderr', 'w' ) );
+        }
+
         fwrite( STDERR, $this->getMap()->getMessage() . PHP_EOL );
+
+        return $this;
     }
 
+    /**
+     * Set map.
+     *
+     * @param MapInterface $map Map Class.
+     *
+     * @return OutputInterface
+     */
     public function setMap( MapInterface $map ) : OutputInterface
     {
         $this->map = $map;
@@ -33,6 +55,11 @@ class CLI implements OutputInterface
         return $this;
     }
 
+    /**
+     * Get map.
+     *
+     * @return MapInterface
+     */
     public function getMap() : MapInterface
     {
         return $this->map;

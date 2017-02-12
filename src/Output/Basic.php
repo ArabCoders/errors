@@ -9,27 +9,50 @@
  */
 namespace arabcoders\errors\Output;
 
-use arabcoders\errors\
-{
-    Interfaces\MapInterface, Output\Interfaces\OutputInterface
-};
+use arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\Output\Interfaces\OutputInterface;
 
+/**
+ * Class Basic
+ *
+ * @package arabcoders\errors\Output
+ */
 class Basic implements OutputInterface
 {
     /**
-     * @var MapInterface
+     * @var MapInterface Map class.
      */
     private $map;
 
+    /**
+     * @var string Basic message to display.
+     */
     const MSG = '500 Internal Server Error';
 
-    public function display()
+    /**
+     * Set Header and display Message.
+     *
+     * @return OutputInterface
+     */
+    public function display() : OutputInterface
     {
-        header( $_SERVER['SERVER_PROTOCOL'] . ' ' . self::MSG, true, 500 );
+        if ( !headers_sent() )
+        {
+            header( $_SERVER['SERVER_PROTOCOL'] . ' ' . self::MSG, true, 500 );
+        }
 
         print self::MSG;
+
+        return $this;
     }
 
+    /**
+     * Set map.
+     *
+     * @param MapInterface $map Map Class.
+     *
+     * @return OutputInterface
+     */
     public function setMap( MapInterface $map ) : OutputInterface
     {
         $this->map = $map;
@@ -37,6 +60,11 @@ class Basic implements OutputInterface
         return $this;
     }
 
+    /**
+     * Get map.
+     *
+     * @return MapInterface
+     */
     public function getMap() : MapInterface
     {
         return $this->map;

@@ -9,64 +9,69 @@
  */
 namespace arabcoders\errors;
 
-use arabcoders\errors\
-{
-    Interfaces\ErrorMapInterface, Interfaces\FormatterInterface, Interfaces\SpecialCaseInterface,
-    Interfaces\ErrorInterface, Interfaces\StructuredInterface, Interfaces\TracerInterface,
-    Output\Interfaces\OutputInterface, Logging\Interfaces\LoggingInterface, Interfaces\MapInterface,
-    Interfaces\PolicyInterface
-};
+use arabcoders\errors\Interfaces\ErrorInterface;
+use arabcoders\errors\Interfaces\ErrorMapInterface;
+use arabcoders\errors\Interfaces\FormatterInterface;
+use arabcoders\errors\Interfaces\ListenerInterface;
+use arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\Interfaces\PolicyInterface;
+use arabcoders\errors\Interfaces\StructuredInterface;
+use arabcoders\errors\Interfaces\TracerInterface;
+use arabcoders\errors\Logging\Interfaces\LoggingInterface;
+use arabcoders\errors\Output\Interfaces\OutputInterface;
 
+/**
+ * Class Error
+ *
+ * @package arabcoders\errors
+ */
 class Error implements ErrorInterface
 {
     /**
-     * Holds instances of {@see SpecialCaseInterface}
-     *
-     * @var array
+     * @var ListenerInterface[][] instances of {@see ListenerInterface}
      */
-    protected $specialCases = [];
+    protected $listener = [];
 
     /**
-     * Holds instances of logging services.
-     *
-     * @var LoggingInterface[]
+     * @var LoggingInterface[] logging services.
      */
-    protected $loggingServices = [];
+    protected $loggers = [];
 
     /**
-     * @var FormatterInterface
+     * @var FormatterInterface Message formatter
      */
     protected $formatter;
 
     /**
-     * @var TracerInterface
+     * @var TracerInterface Context tracer.
      */
     protected $tracer;
+
     /**
-     * @var StructuredInterface
+     * @var StructuredInterface Structured data mapper.
      */
     protected $structured;
 
     /**
-     * @var OutputInterface
+     * @var OutputInterface Output handler.
      */
     protected $output;
 
     /**
-     * @var MapInterface
+     * @var MapInterface Map class.
      */
     protected $map;
 
     /**
-     * @var PolicyInterface[][]
+     * @var PolicyInterface[][] instances of {@see PolicyInterface}
      */
     protected $policies = [];
 
     /**
      * Error constructor.
      *
-     * @param bool  $default
-     * @param array $options
+     * @param bool  $default Whether to initialise default logger and output.
+     * @param array $options More options right now it does nothing.
      */
     public function __construct( bool $default = false, array $options = [] )
     {
@@ -81,6 +86,13 @@ class Error implements ErrorInterface
         }
     }
 
+    /**
+     * Set message formatter.
+     *
+     * @param FormatterInterface $formatter Message formatter.
+     *
+     * @return ErrorInterface
+     */
     public function setFormatter( FormatterInterface $formatter ) : ErrorInterface
     {
         $this->formatter = $formatter;
@@ -88,11 +100,23 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Get formatter.
+     *
+     * @return FormatterInterface
+     */
     public function getFormatter() : FormatterInterface
     {
         return $this->formatter;
     }
 
+    /**
+     * Set Tracer.
+     *
+     * @param TracerInterface $tracer Context tracer.
+     *
+     * @return ErrorInterface
+     */
     public function setTracer( TracerInterface $tracer ) : ErrorInterface
     {
         $this->tracer = $tracer;
@@ -100,11 +124,23 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Get tracer.
+     *
+     * @return TracerInterface
+     */
     public function getTracer() : TracerInterface
     {
         return $this->tracer;
     }
 
+    /**
+     * Set output.
+     *
+     * @param OutputInterface $output Output handler.
+     *
+     * @return mixed
+     */
     public function setOutput( OutputInterface $output ) : ErrorInterface
     {
         $this->output = $output;
@@ -112,11 +148,23 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Get output.
+     *
+     * @return OutputInterface
+     */
     public function getOutput() : OutputInterface
     {
         return $this->output;
     }
 
+    /**
+     * Set structured mapper.
+     *
+     * @param StructuredInterface $structured Structured data mapper.
+     *
+     * @return ErrorInterface
+     */
     public function setStructured( StructuredInterface $structured ) : ErrorInterface
     {
         $this->structured = $structured;
@@ -124,12 +172,24 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Get structured mapper.
+     *
+     * @return StructuredInterface
+     */
     public function getStructured() : StructuredInterface
     {
 
         return $this->structured;
     }
 
+    /**
+     * Set map.
+     *
+     * @param MapInterface $map Map class.
+     *
+     * @return ErrorInterface
+     */
     public function setMap( MapInterface $map ) : ErrorInterface
     {
         $this->map = $map;
@@ -137,11 +197,21 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Get map.
+     *
+     * @return MapInterface
+     */
     public function getMap() : MapInterface
     {
         return $this->map;
     }
 
+    /**
+     * Register handlers for error/shutdown/exceptions.
+     *
+     * @return ErrorInterface
+     */
     public function register() : ErrorInterface
     {
         set_error_handler( function ( int $number, string $text, string $file, int $line )
@@ -158,7 +228,9 @@ class Error implements ErrorInterface
                 return;
             }
 
-            $this->handleError( new ErrorMap( (int) $error['type'], (string) $error['message'], (string) $error['file'], (int) $error['line'] ) );
+            $this->handleError(
+                new ErrorMap( (int) $error['type'], (string) $error['message'], (string) $error['file'], (int) $error['line'] )
+            );
         } );
 
         set_exception_handler( function ( \Throwable $exception )
@@ -169,6 +241,13 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Process error.
+     *
+     * @param ErrorMapInterface $error Error instance.
+     *
+     * @return ErrorInterface
+     */
     public function handleError( ErrorMapInterface $error ) : ErrorInterface
     {
         // error was suppressed with the @-operator
@@ -186,10 +265,9 @@ class Error implements ErrorInterface
              ->setError( $error )
              ->getInstance();
 
-        if ( array_key_exists( $error->getNumber(), $this->specialCases ) )
+        if ( array_key_exists( $error->getNumber(), $this->listener ) )
         {
-            /** @var SpecialCaseInterface $handler */
-            foreach ( $this->specialCases[$error->getNumber()] as $handler )
+            foreach ( $this->listener[$error->getNumber()] as $handler )
             {
                 $handler->setMap( $this->getMap() )->handle();
             }
@@ -200,6 +278,13 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Process exception.
+     *
+     * @param \Throwable $exception The thrown exception
+     *
+     * @return ErrorInterface
+     */
     public function handleException( \Throwable $exception ) : ErrorInterface
     {
         $this->getMap()->clear()
@@ -212,10 +297,9 @@ class Error implements ErrorInterface
 
         $name = get_class( $exception );
 
-        if ( array_key_exists( $name, $this->specialCases ) )
+        if ( array_key_exists( $name, $this->listener ) )
         {
-            /** @var SpecialCaseInterface $handler */
-            foreach ( $this->specialCases[$name] as $handler )
+            foreach ( $this->listener[$name] as $handler )
             {
                 $handler->setMap( $this->getMap() )->handle();
             }
@@ -226,54 +310,102 @@ class Error implements ErrorInterface
         return $this;
     }
 
-    public function addSpecialCase( $parameter, string $name, SpecialCaseInterface $handler ) : ErrorInterface
+    /**
+     * Attach Listener for specific exception or error.
+     *
+     * @param string|int        $parameter Class FQN or error number.
+     * @param string            $name      Name to refer to this Listener.
+     * @param ListenerInterface $handler   The initialized handler.
+     *
+     * @return ErrorInterface
+     * @throws \InvalidArgumentException if parameter is neither string nor int.
+     */
+    public function addListener( $parameter, string $name, ListenerInterface $handler ) : ErrorInterface
     {
-        if ( !array_key_exists( $parameter, $this->specialCases ) )
+        if ( !is_string( $parameter ) && is_int( $parameter ) )
         {
-            $this->specialCases[$parameter] = [];
+            throw new \InvalidArgumentException( '$parameter is neither string nor int.' );
         }
 
-        $this->specialCases[$parameter][$name] = $handler;
+        if ( !array_key_exists( $parameter, $this->listener ) )
+        {
+            $this->listener[$parameter] = [];
+        }
+
+        $this->listener[$parameter][$name] = $handler;
 
         return $this;
     }
 
-    public function deleteSpecialCase( $parameter, string $name ) : ErrorInterface
+    /**
+     * Delete listener.
+     *
+     * @param string|int $parameter Class FQN or error number.
+     * @param string     $name      The name that was used in {@see addListener}
+     *
+     * @return ErrorInterface
+     * @throws \InvalidArgumentException if parameter does not exists or listener name is not registered.
+     */
+    public function deleteListener( $parameter, string $name ) : ErrorInterface
     {
-        if ( !array_key_exists( $parameter, $this->specialCases ) )
+        if ( !array_key_exists( $parameter, $this->listener ) )
         {
-            throw new \InvalidArgumentException( sprintf( '(%s) has no specialCases Registered.', $parameter ) );
+            throw new \InvalidArgumentException( sprintf( '(%s) has no Listener Registered.', $parameter ) );
         }
 
-        if ( !array_key_exists( $name, $this->specialCases[$parameter] ) )
+        if ( !array_key_exists( $name, $this->listener[$parameter] ) )
         {
-            throw new \InvalidArgumentException( sprintf( '(%s) has no registered specialCases of name (%s).', $parameter, $name ) );
+            throw new \InvalidArgumentException( sprintf( '(%s) has no registered Listener of name (%s).', $parameter, $name ) );
         }
 
-        unset( $this->specialCases[$parameter][$name] );
+        unset( $this->listener[$parameter][$name] );
 
         return $this;
     }
 
+    /**
+     * Add logging service.
+     *
+     * @param string           $name   Name to refer to this logging service.
+     * @param LoggingInterface $logger The initialized handler.
+     *
+     * @return ErrorInterface
+     */
     public function addLogger( string $name, LoggingInterface $logger ) : ErrorInterface
     {
-        $this->loggingServices[$name] = $logger;
+        $this->loggers[$name] = $logger;
 
         return $this;
     }
 
+    /**
+     * Delete logging service.
+     *
+     * @param string $name The name that was used in {@see addLogger}
+     *
+     * @return ErrorInterface
+     * @throws \InvalidArgumentException if logger name is not registered.
+     */
     public function deleteLogger( string $name ) : ErrorInterface
     {
-        if ( !array_key_exists( $name, $this->loggingServices ) )
+        if ( !array_key_exists( $name, $this->loggers ) )
         {
             throw new \InvalidArgumentException( sprintf( 'No Logger Service of name (%s) registered.', $name ) );
         }
 
-        unset( $this->loggingServices[$name] );
+        unset( $this->loggers[$name] );
 
         return $this;
     }
 
+    /**
+     * Add policy.
+     *
+     * @param string          $name   Name to refer to this policy.
+     * @param PolicyInterface $policy The initialized policy.
+     *
+     * @return ErrorInterface
+     */
     public function addPolicy( string $name, PolicyInterface $policy ) : ErrorInterface
     {
         $this->policies[$policy->getParameter()][$name] = $policy;
@@ -281,6 +413,15 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Delete policy.
+     *
+     * @param string|int $parameter Class FQN or error number.
+     * @param string     $name      The name that was used in {@see addPolicy}
+     *
+     * @return ErrorInterface
+     * @throws \InvalidArgumentException if parameter does not exists or policy name is not registered.
+     */
     public function deletePolicy( $parameter, string $name ) : ErrorInterface
     {
 
@@ -322,13 +463,12 @@ class Error implements ErrorInterface
     /**
      * Log Error.
      *
-     * @param string|int $parameter
+     * @param string|int $parameter Class FQN or error number.
      *
      * @return ErrorInterface
      */
     protected function log( $parameter ) : ErrorInterface
     {
-
         if ( array_key_exists( $parameter, $this->policies ) )
         {
             foreach ( $this->policies[$parameter] as $policy )
@@ -340,7 +480,7 @@ class Error implements ErrorInterface
             }
         }
 
-        foreach ( $this->loggingServices as $serviceName => $logger )
+        foreach ( $this->loggers as $serviceName => $logger )
         {
             $logger->clear()
                    ->setMap( $this->getMap() )
@@ -353,7 +493,7 @@ class Error implements ErrorInterface
     /**
      * Display Error.
      *
-     * @param string|int $parameter
+     * @param string|int $parameter Class FQN or error number.
      *
      * @return ErrorInterface
      */
@@ -381,7 +521,7 @@ class Error implements ErrorInterface
     /**
      * Exit Program On Failure.
      *
-     * @param string|int $parameter
+     * @param string|int $parameter Class FQN or error number.
      *
      * @return ErrorInterface
      */
@@ -414,4 +554,5 @@ class Error implements ErrorInterface
 
         return $this;
     }
+
 }

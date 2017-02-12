@@ -3,9 +3,9 @@
 use arabcoders\errors\Error;
 use arabcoders\errors\Interfaces\ErrorInterface;
 use arabcoders\errors\Interfaces\FormatterInterface;
+use arabcoders\errors\Interfaces\ListenerInterface;
 use arabcoders\errors\Interfaces\MapInterface;
 use arabcoders\errors\Interfaces\PolicyInterface;
-use arabcoders\errors\Interfaces\SpecialCaseInterface;
 use arabcoders\errors\Interfaces\StructuredInterface;
 use arabcoders\errors\Interfaces\TracerInterface;
 use arabcoders\errors\Logging\Interfaces\LoggingInterface;
@@ -121,16 +121,16 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals( self::$i, self::$i->register() );
     }
 
-    public function testAddSpecialCase()
+    public function testAddListener()
     {
-        $this->assertEquals( self::$i, self::$i->addSpecialCase( PDOException::class, 'PDO', new SpecialCase() ) );
+        $this->assertEquals( self::$i, self::$i->addListener( PDOException::class, 'PDO', new Listener() ) );
     }
 
-    public function testSpecialCaseBeingCalled()
+    public function testListenerBeingCalled()
     {
-        $specialCase = new SpecialCase();
+        $listener = new Listener();
 
-        self::$i->addSpecialCase( LogicException::class, 'PDO', $specialCase );
+        self::$i->addListener( LogicException::class, 'PDO', $listener );
         self::$i->setOutput( new nullOutput() );
         self::$i->addPolicy(
             LogicException::class,
@@ -138,31 +138,31 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         );
 
         self::$i->handleException( new LogicException( 'foo' ) );
-        $this->assertEquals( true, $specialCase->called );
-        $this->assertEquals( self::$i->getMap(), $specialCase->getMap() );
+        $this->assertEquals( true, $listener->called );
+        $this->assertEquals( self::$i->getMap(), $listener->getMap() );
     }
 
-    public function testDeleteSpecialCaseNoSubSection()
+    public function testDeleteListenerNoSubSection()
     {
         $this->expectException( InvalidArgumentException::class );
 
-        self::$i->deleteSpecialCase( LogicException::class, 'foo' );
+        self::$i->deleteListener( LogicException::class, 'foo' );
     }
 
     public function testDeleteSpecialCaseNoCase()
     {
         $this->expectException( InvalidArgumentException::class );
 
-        self::$i->addSpecialCase( LogicException::class, 'foo', new SpecialCase() );
+        self::$i->addListener( LogicException::class, 'foo', new Listener() );
 
-        self::$i->deleteSpecialCase( LogicException::class, 'bar' );
+        self::$i->deleteListener( LogicException::class, 'bar' );
     }
 
     public function testDeleteSpecialCase()
     {
-        self::$i->addSpecialCase( LogicException::class, 'foo', new SpecialCase() );
+        self::$i->addListener( LogicException::class, 'foo', new Listener() );
 
-        $this->assertEquals( self::$i, self::$i->deleteSpecialCase( LogicException::class, 'foo' ) );
+        $this->assertEquals( self::$i, self::$i->deleteListener( LogicException::class, 'foo' ) );
     }
 
     public function testAddLoggerSuccess()
@@ -302,7 +302,7 @@ class Logger implements LoggingInterface
     }
 }
 
-class SpecialCase implements SpecialCaseInterface
+class Listener implements ListenerInterface
 {
     private $map;
 
@@ -313,7 +313,7 @@ class SpecialCase implements SpecialCaseInterface
         return $this->called = true;
     }
 
-    public function setMap( MapInterface $map ) : SpecialCaseInterface
+    public function setMap( MapInterface $map ) : ListenerInterface
     {
         $this->map = $map;
 
@@ -408,9 +408,9 @@ class nullOutput implements OutputInterface
 {
     private $map;
 
-    public function display()
+    public function display() : OutputInterface
     {
-        return '';
+        return $this;
     }
 
     public function setMap( MapInterface $map ) : OutputInterface

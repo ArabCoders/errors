@@ -20,16 +20,18 @@ interface PolicyInterface
      * PolicyInterface constructor.
      *
      * @param int        $type       {@see ErrorInterface::TYPE_ERROR} or {@see ErrorInterface::TYPE_EXCEPTION}
-     * @param string|int $parameter  Error Number or Exception FQN.
-     * @param bool       $logging    whether to enable logging or not.
-     * @param bool       $displaying whether to enable displaying if the error or not.
-     * @param bool       $exiting    whether to shutdown after encountering this error.
-     * @param \Closure   $closure    Closure to call upon encountering this error.
+     * @param string|int $parameter  Class FQN or error code number.
+     * @param bool       $logging    Enable logging of this error
+     * @param bool       $displaying Enable the displaying of the error.
+     * @param bool       $exiting    Halt the execution of the app when this error is encountered.
+     * @param \Closure   $closure    Closure to call upon when encountering this error.
+     *
+     * @throws \InvalidArgumentException if {@see $parameter} is neither string nor int.
      */
     public function __construct( int $type, $parameter, bool $logging, bool $displaying, bool $exiting, \Closure $closure = null );
 
     /**
-     * is of type.
+     * Is of type.
      *
      * @param int $type {@see ErrorInterface::TYPE_ERROR} or {@see ErrorInterface::TYPE_EXCEPTION}
      *
@@ -38,50 +40,49 @@ interface PolicyInterface
     public function isOfType( int $type ) : bool;
 
     /**
-     * Get Error Type.
+     * Get type.
      *
      * @return int
      */
     public function getType() : int;
 
     /**
-     * Get Parameter as in Error Number or Exception Name.
+     * Get parameter.
      *
      * @return int|string
      */
     public function getParameter();
 
-
     /**
-     * Allow The Logging of this error.
+     * Do we allow the logging of this error.
      *
      * @return bool
      */
     public function allowLogging() : bool;
 
     /**
-     * Allow The Displaying of this error.
+     * Do we allow the displaying of this error.
      *
      * @return bool
      */
     public function allowDisplaying() : bool;
 
     /**
-     * Whether to shutdown the app after encountering this error.
+     * Do we allow the exiting of the application if we encounter this error.
      *
      * @return bool
      */
     public function allowExiting() : bool;
 
     /**
-     * Does This Policy have closure?
+     * Does this policy have closure.
      *
      * @return bool
      */
     public function hasClosure() : bool;
 
     /**
-     * Get Closure.
+     * Get closure.
      *
      * @return \Closure
      */

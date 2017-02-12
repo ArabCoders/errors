@@ -17,55 +17,57 @@ namespace arabcoders\errors\Interfaces;
 interface TracerInterface
 {
     /**
-     * Set Root Path To strip from Trace.
+     * Set root path to strip from file name, for example
+     * if $root is set to "/home/foo/" and the file full path is "/home/foo/bar/file.php", it will be shown as
+     * /bar/file.php.
      *
-     * @param string $root
+     * @param string $root Root path
      *
      * @return TracerInterface
      */
     public function setRoot( string $root ) : TracerInterface;
 
     /**
-     * Get Root Path.
+     * Get root path.
      *
      * @return string
      */
     public function getRoot() : string;
 
     /**
-     * Set Debug Trace Context.
+     * Set trace context.
      *
-     * @param array $context
+     * @param array $context Trace context.
      *
      * @return TracerInterface
      */
     public function setContext( array $context ) : TracerInterface;
 
     /**
-     * Ignore Calls from these files.
+     * Ignore trace data from those files.
      *
-     * @param array $files
+     * @param array $files List of files to be ignored in the generated trace data.
      *
      * @return TracerInterface
      */
     public function setIgnore( array $files ) : TracerInterface;
 
     /**
-     * Process the Trace.
+     * Process trace context.
      *
      * @return TracerInterface
      */
     public function process() : TracerInterface;
 
     /**
-     * Get Trace Data.
+     * Get processed trace data.
      *
      * @return array
      */
     public function getTrace() : array;
 
     /**
-     * Clear Data.
+     * Clear data.
      *
      * @return TracerInterface
      */

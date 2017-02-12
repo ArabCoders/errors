@@ -11,36 +11,40 @@ namespace arabcoders\errors;
 
 use arabcoders\errors\Interfaces\TracerInterface;
 
+/**
+ * Class Tracer
+ *
+ * @package arabcoders\errors
+ */
 class Tracer implements TracerInterface
 {
     /**
-     * Formatted Trace Data.
-     *
-     * @var array
+     * @var array Processed trace data.
      */
-    private $trace = [];
+    protected $trace = [];
 
     /**
-     * Context for Tracing.
-     *
-     * @var array
+     * @var array Trace context.
      */
-    private $context = [];
+    protected $context = [];
 
     /**
-     * Files to Ignore From Trace.
-     *
-     * @var array
+     * @var array Files to ignore trace data from.
      */
-    private $ignore = [];
+    protected $ignore = [];
 
     /**
-     * Root Path to remove from File path.
-     *
-     * @var string
+     * @var string Root path to strip from file name.
      */
-    private $root = '';
+    protected $root = '';
 
+    /**
+     * Set root path to strip from file name.
+     *
+     * @param string $root
+     *
+     * @return TracerInterface
+     */
     public function setRoot( string $root ) : TracerInterface
     {
         $this->root = $root;
@@ -48,11 +52,23 @@ class Tracer implements TracerInterface
         return $this;
     }
 
+    /**
+     * Get Root path.
+     *
+     * @return string
+     */
     public function getRoot() : string
     {
         return $this->root;
     }
 
+    /**
+     * Ignore trace data from those files.
+     *
+     * @param array $files
+     *
+     * @return TracerInterface
+     */
     public function setIgnore( array $files ) : TracerInterface
     {
         $this->ignore = array_merge_recursive( [ __FILE__ ], $files );
@@ -60,6 +76,13 @@ class Tracer implements TracerInterface
         return $this;
     }
 
+    /**
+     * Set trace context.
+     *
+     * @param array $context
+     *
+     * @return TracerInterface
+     */
     public function setContext( array $context ) : TracerInterface
     {
         $this->context = $context;
@@ -67,6 +90,11 @@ class Tracer implements TracerInterface
         return $this;
     }
 
+    /**
+     * Process trace context.
+     *
+     * @return TracerInterface
+     */
     public function process() : TracerInterface
     {
         try
@@ -146,11 +174,21 @@ class Tracer implements TracerInterface
         return $this;
     }
 
+    /**
+     * Get processed trace data.
+     *
+     * @return array
+     */
     public function getTrace() : array
     {
         return $this->trace;
     }
 
+    /**
+     * Clear data.
+     *
+     * @return TracerInterface
+     */
     public function clear() : TracerInterface
     {
         $this->context = [];

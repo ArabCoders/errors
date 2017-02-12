@@ -9,15 +9,48 @@
  */
 namespace arabcoders\errors\Interfaces;
 
+/**
+ * Interface ErrorMapInterface
+ *
+ * @package arabcoders\errors\Interfaces
+ */
 interface ErrorMapInterface
 {
-    public function __construct( int $number, string $message, string $file, string $line );
+    /**
+     * ErrorMapInterface constructor.
+     *
+     * @param int    $number  Error code number.
+     * @param string $message Error message.
+     * @param string $file    File name where the error was triggered.
+     * @param int    $line    Line number where the error was triggered.
+     */
+    public function __construct( int $number, string $message, string $file, int $line );
 
+    /**
+     * Get error code number.
+     *
+     * @return int
+     */
     public function getNumber() : int;
 
+    /**
+     * Get error message.
+     *
+     * @return string
+     */
     public function getMessage() : string;
 
+    /**
+     * Get the filename where the error was triggered.
+     *
+     * @return string
+     */
     public function getFile() : string;
 
+    /**
+     * Get the line number where the error was triggered.
+     *
+     * @return int
+     */
     public function getLine() : int;
 }

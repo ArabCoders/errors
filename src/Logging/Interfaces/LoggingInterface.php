@@ -11,10 +11,15 @@ namespace arabcoders\errors\Logging\Interfaces;
 
 use arabcoders\errors\Interfaces\MapInterface;
 
+/**
+ * Interface LoggingInterface
+ *
+ * @package arabcoders\errors\Logging\Interfaces
+ */
 Interface LoggingInterface
 {
     /**
-     * Process Log Data.
+     * Process data to log.
      *
      * @return LoggingInterface
      */
@@ -28,16 +33,16 @@ Interface LoggingInterface
     public function clear() : LoggingInterface;
 
     /**
-     * Set Map.
+     * Set map.
      *
-     * @param MapInterface $map
+     * @param MapInterface $map Map class.
      *
      * @return LoggingInterface
      */
     public function setMap( MapInterface $map ) : LoggingInterface;
 
     /**
-     * Get Map.
+     * Get map.
      *
      * @return MapInterface
      */

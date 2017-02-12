@@ -9,47 +9,31 @@
  */
 namespace arabcoders\errors;
 
+use arabcoders\errors\Interfaces\ErrorInterface;
 use arabcoders\errors\Interfaces\ErrorMapInterface;
 use arabcoders\errors\Interfaces\StructuredInterface;
 
+/**
+ * Class Structured
+ *
+ * @package arabcoders\errors
+ */
 class Structured implements StructuredInterface
 {
-    private $message = '';
+    /**
+     * @var string Error message
+     */
+    protected $message = '';
 
-    private $trace = [];
-
-    private $structured = [];
-
-    public function setError( ErrorMapInterface $map ) : StructuredInterface
-    {
-        $this->structured['error'] = [
-            'errorType' => Interfaces\ErrorInterface::ERROR_CODES[$map->getNumber()] ?? $map->getNumber(),
-            'errorCode' => $map->getNumber(),
-            'file'      => $map->getFile(),
-            'line'      => $map->getLine(),
-            'message'   => $map->getMessage(),
-        ];
-
-        return $this;
-    }
-
-    public function setException( \Throwable $e ) : StructuredInterface
-    {
-        $this->structured['exception'] = [
-            'type'    => get_class( $e ),
-            'code'    => $e->getCode(),
-            'file'    => $e->getFile(),
-            'line'    => $e->getLine(),
-            'message' => $e->getMessage(),
-        ];
-
-        return $this;
-    }
+    /**
+     * @var array Structured data.
+     */
+    protected $structured = [];
 
     /**
      * Set Message.
      *
-     * @param string $message
+     * @param string $message Error message.
      *
      * @return StructuredInterface
      */
@@ -61,7 +45,47 @@ class Structured implements StructuredInterface
     }
 
     /**
-     * Process Log Data.
+     * Set error.
+     *
+     * @param ErrorMapInterface $error Error instance.
+     *
+     * @return StructuredInterface
+     */
+    public function setError( ErrorMapInterface $error ) : StructuredInterface
+    {
+        $this->structured['error'] = [
+            'errorType' => ErrorInterface::ERROR_CODES[$error->getNumber()] ?? $error->getNumber(),
+            'errorCode' => $error->getNumber(),
+            'file'      => $error->getFile(),
+            'line'      => $error->getLine(),
+            'message'   => $error->getMessage(),
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Set exception
+     *
+     * @param \Throwable $exception The thrown exception.
+     *
+     * @return StructuredInterface
+     */
+    public function setException( \Throwable $exception ) : StructuredInterface
+    {
+        $this->structured['exception'] = [
+            'type'    => get_class( $exception ),
+            'code'    => $exception->getCode(),
+            'file'    => $exception->getFile(),
+            'line'    => $exception->getLine(),
+            'message' => $exception->getMessage(),
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Process structured data.
      *
      * @return StructuredInterface
      */
@@ -84,7 +108,7 @@ class Structured implements StructuredInterface
     }
 
     /**
-     * Get Processed Structured Data.
+     * Get processed structured data.
      *
      * @return array
      */
@@ -93,11 +117,15 @@ class Structured implements StructuredInterface
         return $this->structured;
     }
 
+    /**
+     * Clear data.
+     *
+     * @return StructuredInterface
+     */
     public function clear() : StructuredInterface
     {
-        $this->structured = [];
-        $this->trace      = [];
         $this->message    = '';
+        $this->structured = [];
 
         return $this;
     }

@@ -18,12 +18,35 @@ use arabcoders\errors\Interfaces\ErrorMapInterface;
  */
 class ErrorMap implements ErrorMapInterface
 {
-    private $number  = 0;
-    private $message = '';
-    private $file    = '';
-    private $line    = 0;
+    /**
+     * @var int Error code number.
+     */
+    protected $number = 0;
 
-    public function __construct( int $number, string $message, string $file, string $line )
+    /**
+     * @var string Error message.
+     */
+    protected $message = '';
+
+    /**
+     * @var string Filename where the error was triggered.
+     */
+    protected $file = '';
+
+    /**
+     * @var int Line number where the error was triggered.
+     */
+    protected $line = 0;
+
+    /**
+     * ErrorMapInterface constructor.
+     *
+     * @param int    $number  Error code number.
+     * @param string $message Error message.
+     * @param string $file    File name where the error was triggered.
+     * @param int    $line    Line number where the error was triggered.
+     */
+    public function __construct( int $number, string $message, string $file, int $line )
     {
         $this->number  = $number;
         $this->message = $message;
@@ -31,21 +54,41 @@ class ErrorMap implements ErrorMapInterface
         $this->line    = $line;
     }
 
+    /**
+     * Get error code number.
+     *
+     * @return int
+     */
     public function getNumber() : int
     {
         return $this->number;
     }
 
+    /**
+     * Get error message.
+     *
+     * @return string
+     */
     public function getMessage() : string
     {
         return $this->message;
     }
 
+    /**
+     * Get the filename where the error was triggered.
+     *
+     * @return string
+     */
     public function getFile() : string
     {
         return $this->file;
     }
 
+    /**
+     * Get the line number where the error was triggered.
+     *
+     * @return int
+     */
     public function getLine() : int
     {
         return $this->line;

@@ -9,10 +9,9 @@
  */
 namespace arabcoders\errors\Output;
 
-use arabcoders\errors\
-{
-    Interfaces\ErrorInterface, Interfaces\MapInterface, Output\Interfaces\OutputInterface
-};
+use arabcoders\errors\Interfaces\ErrorInterface;
+use arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\Output\Interfaces\OutputInterface;
 use Twig_Environment;
 
 /**
@@ -24,25 +23,25 @@ class Twig implements OutputInterface
 {
 
     /**
-     * @var MapInterface
+     * @var MapInterface Map class.
      */
     private $map;
 
     /**
-     * @var Twig_Environment
+     * @var Twig_Environment Initialized twig environment.
      */
     private $twig;
 
     /**
-     * @var string
+     * @var string twig template name. eg (errorHandler.twig)
      */
     private $template;
 
     /**
-     * Twig constructor,
+     * Twig constructor
      *
-     * @param Twig_Environment $twig
-     * @param string           $template
+     * @param Twig_Environment $twig     Initialized twig environment.
+     * @param string           $template twig template name. eg (errorHandler.twig)
      */
     public function __construct( Twig_Environment $twig, string $template )
     {
@@ -53,17 +52,19 @@ class Twig implements OutputInterface
 
     /**
      * it will provide {@see Twig_Environment} with 5 variables named as the following.
-     * <code>
+     * ```php
      * [
      *      'type'       => 'error kind',
      *      'className'  => 'Exception name or null',
      *      'message'    => 'the error message as string'
-     *      'trace'      => 'trace as json encoded string or null if empty',
-     *      'structured' => 'trace as json encoded string or null if empty',
+     *      'trace'      => 'trace data as json encoded string or null if empty',
+     *      'structured' => 'structured data as json encoded string or null if empty',
      * ]
-     * </code>
+     * ```
+     *
+     * @return OutputInterface
      */
-    public function display()
+    public function display() : OutputInterface
     {
         $trace = $this->getMap()->getTrace();
 
@@ -82,8 +83,17 @@ class Twig implements OutputInterface
             'trace'      => ( !empty( $trace ) ) ? json_encode( $trace, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
             'structured' => ( !empty( $structured ) ) ? json_encode( $structured, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
         ] );
+
+        return $this;
     }
 
+    /**
+     * Set map.
+     *
+     * @param MapInterface $map Map class.
+     *
+     * @return OutputInterface
+     */
     public function setMap( MapInterface $map ) : OutputInterface
     {
         $this->map = $map;
@@ -91,6 +101,11 @@ class Twig implements OutputInterface
         return $this;
     }
 
+    /**
+     * Get map.
+     *
+     * @return MapInterface
+     */
     public function getMap() : MapInterface
     {
         return $this->map;

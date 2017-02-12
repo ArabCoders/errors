@@ -9,26 +9,28 @@
  */
 namespace arabcoders\errors\Interfaces;
 
-use arabcoders\errors\
-{
-    Output\Interfaces\OutputInterface,
-    Logging\Interfaces\LoggingInterface
-};
+use arabcoders\errors\Logging\Interfaces\LoggingInterface;
+use arabcoders\errors\Output\Interfaces\OutputInterface;
 
+/**
+ * Interface ErrorInterface
+ *
+ * @package arabcoders\errors\Interfaces
+ */
 interface ErrorInterface
 {
     /**
-     * @var int Type Error.
+     * @var int Type error.
      */
     const TYPE_ERROR = 0;
 
     /**
-     * @var int Type Exception.
+     * @var int Type exception.
      */
     const TYPE_EXCEPTION = 1;
 
     /**
-     * @var array All PHP Core Errors.
+     * @var array All PHP core errors.
      */
     const ERROR_CODES = [
         E_ERROR             => 'E_ERROR',
@@ -49,7 +51,7 @@ interface ErrorInterface
     ];
 
     /**
-     * @var array Fatal Errors
+     * @var array Fatal errors
      */
     const FATAL_ERRORS = [
         E_ERROR,
@@ -61,55 +63,55 @@ interface ErrorInterface
     ];
 
     /**
-     * Register Handlers for Error/shutdown/Exceptions.
+     * Register handlers for error/shutdown/exceptions.
      *
      * @return ErrorInterface
      */
     public function register() : ErrorInterface;
 
     /**
-     * Set Error/Exception Message Formatter.
+     * Set message formatter.
      *
-     * @param FormatterInterface $formatter
+     * @param FormatterInterface $formatter Message formatter instance.
      *
      * @return ErrorInterface
      */
     public function setFormatter( FormatterInterface $formatter ) : ErrorInterface;
 
     /**
-     * Get Formatter.
+     * Get formatter.
      *
      * @return FormatterInterface
      */
     public function getFormatter() : FormatterInterface;
 
     /**
-     * Set Output.
+     * Set output.
      *
-     * @param OutputInterface $output
+     * @param OutputInterface $output Output instance.
      *
      * @return mixed
      */
     public function setOutput( OutputInterface $output ) : ErrorInterface;
 
     /**
-     * Get Output.
+     * Get output.
      *
      * @return OutputInterface
      */
     public function getOutput() : OutputInterface;
 
     /**
-     * Set Structured Data Mapper.
+     * Set structured mapper.
      *
-     * @param StructuredInterface $structured
+     * @param StructuredInterface $structured Structured instance.
      *
      * @return ErrorInterface
      */
     public function setStructured( StructuredInterface $structured ) : ErrorInterface;
 
     /**
-     * Get Structured Mapper.
+     * Get structured mapper.
      *
      * @return StructuredInterface
      */
@@ -118,108 +120,114 @@ interface ErrorInterface
     /**
      * Set Tracer.
      *
-     * @param TracerInterface $tracer
+     * @param TracerInterface $tracer Tracer instance.
      *
      * @return ErrorInterface
      */
     public function setTracer( TracerInterface $tracer ) : ErrorInterface;
 
     /**
-     * Get Tracer.
+     * Get tracer.
      *
      * @return TracerInterface
      */
     public function getTracer() : TracerInterface;
 
     /**
-     * Process Exceptions.
+     * Process exception.
      *
-     * @param \Throwable $exception
+     * @param \Throwable $exception The thrown exception
      *
      * @return ErrorInterface
      */
     public function handleException( \Throwable $exception ) : ErrorInterface;
 
     /**
-     * Process Fetal & normal Errors.
+     * Process error.
      *
-     * @param ErrorMapInterface $error
+     * @param ErrorMapInterface $error The error
      *
      * @return ErrorInterface
      */
     public function handleError( ErrorMapInterface $error ) : ErrorInterface;
 
     /**
-     * Register Specific Handler for special kind of Exception or error.
+     * Add Listener for specific exception or error.
      *
-     * @param string|int           $parameter className or Error Number.
-     * @param string               $name
-     * @param SpecialCaseInterface $handler
-     *
-     * @return ErrorInterface
-     */
-    public function addSpecialCase( $parameter, string $name, SpecialCaseInterface $handler ) : ErrorInterface;
-
-    /**
-     * @param string|int $parameter class Name or Error Number.
-     * @param string     $name
+     * @param string|int        $parameter Class FQN or error number.
+     * @param string            $name      Name to refer to this Listener.
+     * @param ListenerInterface $handler   The initialized handler.
      *
      * @return ErrorInterface
+     * @throws \InvalidArgumentException if parameter is neither string nor int.
      */
-    public function deleteSpecialCase( $parameter, string $name ) : ErrorInterface;
+    public function addListener( $parameter, string $name, ListenerInterface $handler ) : ErrorInterface;
 
     /**
-     * Register Logger.
+     * Delete listener.
      *
-     * @param string           $name
-     * @param LoggingInterface $logger
+     * @param string|int $parameter Class FQN or error number.
+     * @param string     $name      The name that was used in {@see addListener}
+     *
+     * @return ErrorInterface
+     * @throws \InvalidArgumentException if parameter does not exists or listener name is not registered.
+     */
+    public function deleteListener( $parameter, string $name ) : ErrorInterface;
+
+    /**
+     * Add logging service.
+     *
+     * @param string           $name   Name to refer to this logging service.
+     * @param LoggingInterface $logger The initialized handler.
      *
      * @return ErrorInterface
      */
     public function addLogger( string $name, LoggingInterface $logger ) : ErrorInterface;
 
     /**
-     * Remove Logger.
+     * Delete logging service.
      *
-     * @param string $name
+     * @param string $name The name that was used in {@see addLogger}
      *
      * @return ErrorInterface
+     * @throws \InvalidArgumentException if logger name is not registered.
      */
     public function deleteLogger( string $name ) : ErrorInterface;
 
     /**
-     * Set Map.
+     * Set map.
      *
-     * @param MapInterface $map
+     * @param MapInterface $map Map class.
      *
      * @return ErrorInterface
      */
     public function setMap( MapInterface $map ) : ErrorInterface;
 
     /**
-     * Get Map.
+     * Get map.
      *
      * @return MapInterface
      */
     public function getMap() : MapInterface;
 
     /**
-     * Add Policy.
+     * Add policy.
      *
-     * @param string          $name
-     * @param PolicyInterface $policy
+     * @param string          $name   Name to refer to this policy.
+     * @param PolicyInterface $policy The initialized policy.
      *
      * @return ErrorInterface
      */
     public function addPolicy( string $name, PolicyInterface $policy ) : ErrorInterface;
 
     /**
-     * Delete Policy.
+     * Delete policy.
      *
-     * @param string|int $parameter
-     * @param string     $name
+     * @param string|int $parameter Class FQN or error number.
+     * @param string     $name      The name that was used in {@see addPolicy}
      *
      * @return ErrorInterface
+     * @throws \InvalidArgumentException if parameter does not exists or policy name is not registered.
      */
     public function deletePolicy( $parameter, string $name ) : ErrorInterface;
 }

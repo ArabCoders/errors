@@ -9,127 +9,148 @@
  */
 namespace arabcoders\errors\Interfaces;
 
+/**
+ * Interface MapInterface
+ *
+ * @package arabcoders\errors\Interfaces
+ */
 interface MapInterface
 {
     /**
-     * Does The map Contain an error
+     * Set error type.
      *
-     * @return bool
-     */
-    public function isError() : bool;
-
-    /**
-     * Does The map Contain an Exception
-     *
-     * @return bool
-     */
-    public function isException() : bool;
-
-    /**
-     * Set Error Type.
-     *
-     * @param int $type
+     * @param int $type {@see ErrorInterface::TYPE_ERROR} or {@see ErrorInterface::TYPE_EXCEPTION}
      *
      * @return MapInterface
      */
     public function setType( int $type ) : MapInterface;
 
     /**
-     * Get Error Type.
+     * Get error type.
      *
      * @return int
      */
     public function getType() : int;
 
     /**
-     * set Trace.
+     * Is the type of this instance is {@see ErrorInterface::TYPE_ERROR}.
      *
-     * @param array $trace
+     * @return bool
+     */
+    public function isError() : bool;
+
+    /**
+     * Is the type of this instance is {@see ErrorInterface::TYPE_EXCEPTION}.
+     *
+     * @return bool
+     */
+    public function isException() : bool;
+
+    /**
+     * Set trace data.
+     *
+     * @param array $trace Formatted trace data.
      *
      * @return MapInterface
      */
     public function setTrace( array $trace ) : MapInterface;
 
     /**
-     * Get Trace.
+     * Get trace data.
      *
      * @return array
      */
     public function getTrace() : array;
 
     /**
-     * Set Message.
+     * Set message.
      *
-     * @param string $message
+     * @param string $message Error message.
      *
      * @return MapInterface
      */
     public function setMessage( string $message ) : MapInterface;
 
     /**
-     * Get Message.
+     * Get message.
      *
      * @return string
      */
     public function getMessage() : string;
 
     /**
-     * Set Structured.
+     * Set structured data.
      *
-     * @param array $structured
+     * @param array $structured Structured data.
      *
      * @return MapInterface
      */
     public function setStructured( array $structured ) : MapInterface;
 
     /**
-     * Get Structured
+     * Get structured data.
      *
      * @return array
      */
     public function getStructured() : array;
 
     /**
-     * Clear Data.
+     * Set error instance.
+     *
+     * @param ErrorMapInterface $error Error instance.
      *
      * @return MapInterface
      */
-    public function clear() : MapInterface;
+    public function setError( ErrorMapInterface $error ) : MapInterface;
 
     /**
-     * @param ErrorMapInterface $errorMap
-     *
-     * @return MapInterface
-     */
-    public function setError( ErrorMapInterface $errorMap ) : MapInterface;
-
-    /**
-     * Get Error
+     * Get error instance.
      *
      * @return ErrorMapInterface
      */
     public function getError() : ErrorMapInterface;
 
     /**
-     * Set Exception.
+     * Does this map contain {@see ErrorMapInterface} object.
      *
-     * @param \Throwable $exception
+     * @return bool
+     */
+    public function hasError() : bool;
+
+    /**
+     * Set exception instance.
+     *
+     * @param \Throwable $exception The thrown exception.
      *
      * @return MapInterface
      */
     public function setException( \Throwable $exception ) : MapInterface;
 
     /**
-     * Get Exception.
+     * Get exception instance.
      *
      * @return \Throwable
      */
     public function getException() : \Throwable;
 
     /**
-     * Return this object.
+     * Does this map contain {@see \Throwable} object.
+     *
+     * @return bool
+     */
+    public function hasException() : bool;
+
+    /**
+     * Return instance.
      *
      * @return MapInterface
      */
     public function getInstance() : MapInterface;
+
+    /**
+     * Clear data.
+     *
+     * @return MapInterface
+     */
+    public function clear() : MapInterface;
 }

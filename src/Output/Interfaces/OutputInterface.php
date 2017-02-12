@@ -20,21 +20,23 @@ use arabcoders\errors\Interfaces\MapInterface;
 Interface OutputInterface
 {
     /**
-     * Process Error for output.
+     * Process data for output.
+     *
+     * @return OutputInterface
      */
-    public function display();
+    public function display() : OutputInterface;
 
     /**
-     * Set Map.
+     * Set map.
      *
-     * @param MapInterface $map
+     * @param MapInterface $map Map class.
      *
      * @return OutputInterface
      */
     public function setMap( MapInterface $map ) : OutputInterface;
 
     /**
-     * Get Map.
+     * Get map.
      *
      * @return MapInterface
      */

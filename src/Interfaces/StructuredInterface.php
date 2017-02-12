@@ -9,44 +9,49 @@
  */
 namespace arabcoders\errors\Interfaces;
 
+/**
+ * Interface StructuredInterface
+ *
+ * @package arabcoders\errors\Interfaces
+ */
 Interface StructuredInterface
 {
     /**
      * Set Message.
      *
-     * @param string $message
+     * @param string $message Error message.
      *
      * @return StructuredInterface
      */
     public function setMessage( string $message ) : StructuredInterface;
 
     /**
-     * Set Exception
+     * Set exception
      *
-     * @param \Throwable $e
-     *
-     * @return StructuredInterface
-     */
-    public function setException( \Throwable $e ) : StructuredInterface;
-
-    /**
-     * Set Error.
-     *
-     * @param ErrorMapInterface $errorMap
+     * @param \Throwable $exception The thrown exception.
      *
      * @return StructuredInterface
      */
-    public function setError( ErrorMapInterface $errorMap ) : StructuredInterface;
+    public function setException( \Throwable $exception ) : StructuredInterface;
 
     /**
-     * Process Log Data.
+     * Set error.
+     *
+     * @param ErrorMapInterface $error Error instance.
+     *
+     * @return StructuredInterface
+     */
+    public function setError( ErrorMapInterface $error ) : StructuredInterface;
+
+    /**
+     * Process structured data.
      *
      * @return StructuredInterface
      */
     public function process() : StructuredInterface;
 
     /**
-     * Get Processed Structured Data.
+     * Get processed structured data.
      *
      * @return array
      */

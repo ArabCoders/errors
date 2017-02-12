@@ -17,7 +17,21 @@ namespace arabcoders\errors\Interfaces;
  */
 Interface FormatterInterface
 {
-    public function formatError( ErrorMapInterface $map ) : string;
+    /**
+     * Format the Error and return it as string.
+     *
+     * @param ErrorMapInterface $error Error instance.
+     *
+     * @return string
+     */
+    public function formatError( ErrorMapInterface $error ) : string;
 
-    public function formatException( \Throwable $e ) : string;
+    /**
+     * Format the exception and return it as string.
+     *
+     * @param \Throwable $exception The thrown exception.
+     *
+     * @return string
+     */
+    public function formatException( \Throwable $exception ) : string;
 }

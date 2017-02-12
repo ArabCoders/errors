@@ -9,36 +9,60 @@
  */
 namespace arabcoders\errors;
 
-use arabcoders\errors\
-{
-    Interfaces\ErrorInterface, Interfaces\ErrorMapInterface, Interfaces\FormatterInterface
-};
+use arabcoders\errors\Interfaces\ErrorInterface;
+use arabcoders\errors\Interfaces\ErrorMapInterface;
+use arabcoders\errors\Interfaces\FormatterInterface;
 
+/**
+ * Class Formatter
+ *
+ * @package arabcoders\errors
+ */
 class Formatter implements FormatterInterface
 {
-    CONST FORMAT_ERROR = "(%s) in (%s:%d) with message (%s) URI: (%s:%s)";
+    /**
+     * @var string Format error.
+     */
+    const FORMAT_ERROR = "(%s) in (%s:%d) with message (%s) URI: (%s:%s)";
 
-    CONST FORMAT_EXCEPTION = "(%s) thrown in (%s:%d) %s URI: (%s:%s)";
+    /**
+     * @var string Format exception.
+     */
+    const FORMAT_EXCEPTION = "(%s) thrown in (%s:%d) %s URI: (%s:%s)";
 
-    public function formatError( ErrorMapInterface $map ) : string
+    /**
+     * Format the Error and return it as string.
+     *
+     * @param ErrorMapInterface $error Error instance.
+     *
+     * @return string
+     */
+    public function formatError( ErrorMapInterface $error ) : string
     {
         return sprintf( self::FORMAT_ERROR,
-                        ErrorInterface::ERROR_CODES[$map->getNumber()] ?? $map->getNumber(),
-                        $map->getFile(),
-                        $map->getLine(),
-                        $map->getMessage(),
+                        ErrorInterface::ERROR_CODES[$error->getNumber()] ?? $error->getNumber(),
+                        $error->getFile(),
+                        $error->getLine(),
+                        $error->getMessage(),
                         $_SERVER['REQUEST_METHOD'] ?? '',
                         $_SERVER['REQUEST_URI'] ?? $_SERVER['PHP_SELF']  ?? ''
         );
     }
 
-    public function formatException( \Throwable $e ) : string
+    /**
+     * Format the exception and return it as string.
+     *
+     * @param \Throwable $exception The thrown exception.
+     *
+     * @return string
+     */
+    public function formatException( \Throwable $exception ) : string
     {
         return sprintf( self::FORMAT_EXCEPTION,
-                        get_class( $e ),
-                        $e->getFile(),
-                        $e->getLine(),
-                        $e->getMessage() ? sprintf( 'with message (%s)', $e->getMessage() ) : '',
+                        get_class( $exception ),
+                        $exception->getFile(),
+                        $exception->getLine(),
+                        $exception->getMessage() ? sprintf( 'with message (%s)', $exception->getMessage() ) : '',
                         $_SERVER['REQUEST_METHOD'] ?? '',
                         $_SERVER['REQUEST_URI'] ?? $_SERVER['PHP_SELF'] ?? ''
         );

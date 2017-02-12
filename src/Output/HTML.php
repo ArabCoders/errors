@@ -9,50 +9,81 @@
  */
 namespace arabcoders\errors\Output;
 
-use arabcoders\errors\
-{
-    Interfaces\ErrorInterface, Interfaces\MapInterface, Output\Interfaces\OutputInterface
-};
+use arabcoders\errors\Interfaces\ErrorInterface;
+use arabcoders\errors\Interfaces\MapInterface;
+use arabcoders\errors\Output\Interfaces\OutputInterface;
 
+/**
+ * Class HTML
+ *
+ * @package arabcoders\errors\Output
+ */
 class HTML implements OutputInterface
 {
     /**
-     * @var MapInterface
+     * @var MapInterface Map class.
      */
     private $map;
 
-    public function display()
+    /**
+     * Process data for output.
+     *
+     * @return OutputInterface
+     */
+    public function display() : OutputInterface
     {
         if ( !headers_sent() )
         {
             header( $_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500 );
-            Header( 'Content-Type: text/html; charset=utf-8' );
+            header( 'Content-Type: text/html; charset=utf-8' );
         }
 
-        $string = '<!DOCTYPE html><html dir="auto"><head><meta charset="utf-8"><title>Error Page</title><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body><h1>An %s has Occurred</h1><blockquote>%s</blockquote>%s%s</body></html>';
-
-        $trace      = '';
-        $structured = '';
+        $string = '<!DOCTYPE html><html><head><meta charset="utf-8">';
+        $string .= '<title>Error Page</title>';
+        $string .= '<meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body>';
+        $string .= '<h1>An %s has Occurred</h1><blockquote>%s</blockquote>%s%s';
+        $string .= '</body></html>';
 
         if ( $this->getMap()->getTrace() )
         {
-            $trace = $this->escape( $this->getMap()->getTrace() );
-            $trace = sprintf( '<h2>Trace Data</h2><blockqoute><pre><code>%s</code></pre></blockqoute>',
-                              json_encode( $trace, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE )
+            $trace = $this->escapeArray( $this->getMap()->getTrace() );
+            $trace = sprintf(
+                '<h2>Trace Data</h2><blockqoute><pre><code>%s</code></pre></blockqoute>',
+                json_encode( $trace, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
             );
+        }
+        else
+        {
+            $trace = '';
         }
 
         if ( $this->getMap()->getStructured() )
         {
-            $structured = $this->escape( $this->getMap()->getStructured() );
-            $structured = sprintf( '<h2>Structured Data</h2><blockqoute><pre><code>%s</code></pre></blockqoute>',
-                                   json_encode( $structured, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE ) );
+            $structured = $this->escapeArray( $this->getMap()->getStructured() );
+            $structured = sprintf(
+                '<h2>Structured Data</h2><blockqoute><pre><code>%s</code></pre></blockqoute>',
+                json_encode( $structured, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
+            );
+        }
+        else
+        {
+            $structured = '';
         }
 
         $type = ( $this->getMap()->getType() == ErrorInterface::TYPE_ERROR ) ? 'Error' : 'Exception';
-        print sprintf( $string, $type, htmlspecialchars( $this->getMap()->getMessage() ), $structured, $trace );
+
+        print sprintf( $string, $type, $this->escapeString( $this->getMap()->getMessage() ), $structured, $trace );
+
+        return $this;
     }
 
+    /**
+     * Set map.
+     *
+     * @param MapInterface $map Map Class.
+     *
+     * @return OutputInterface
+     */
     public function setMap( MapInterface $map ) : OutputInterface
     {
         $this->map = $map;
@@ -60,22 +91,46 @@ class HTML implements OutputInterface
         return $this;
     }
 
+    /**
+     * Get map.
+     *
+     * @return MapInterface
+     */
     public function getMap() : MapInterface
     {
         return $this->map;
     }
 
-    private function escape( array $args ) : array
+    /**
+     * Escape Array Key/values.
+     *
+     * @param array $args The array.
+     *
+     * @return array
+     */
+    private function escapeArray( array $args ) : array
     {
-        /** @noinspection PhpUnusedParameterInspection */
-        array_walk_recursive( $args, function ( $key, &$leaf )
+        array_walk_recursive( $args, function ( &$key, &$leaf )
         {
             if ( is_string( $leaf ) )
             {
-                $leaf = htmlspecialchars( $leaf );
+                $leaf = $this->escapeString( $leaf );
+                $key  = $this->escapeString( $key );
             }
         } );
 
         return $args;
+    }
+
+    /**
+     * Escape Text for HTML output.
+     *
+     * @param string $text Text to be escaped.
+     *
+     * @return string
+     */
+    private function escapeString( string $text ) : string
+    {
+        return htmlspecialchars( $text );
     }
 }
