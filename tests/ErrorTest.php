@@ -121,9 +121,14 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals( self::$i, self::$i->register() );
     }
 
-    public function testAddListener()
+    public function testAddListenerException()
     {
         $this->assertEquals( self::$i, self::$i->addListener( PDOException::class, 'PDO', new Listener() ) );
+    }
+
+    public function testAddListenerError()
+    {
+        $this->assertEquals( self::$i, self::$i->addListener( ErrorInterface::FATAL_ERRORS[\E_ERROR], 'E-Error', new Listener() ) );
     }
 
     public function testListenerBeingCalled()

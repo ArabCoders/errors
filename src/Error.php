@@ -322,9 +322,9 @@ class Error implements ErrorInterface
      */
     public function addListener( $parameter, string $name, ListenerInterface $handler ) : ErrorInterface
     {
-        if ( !is_string( $parameter ) && is_int( $parameter ) )
+        if ( !is_string( $parameter ) && !is_int( $parameter ) )
         {
-            throw new \InvalidArgumentException( '$parameter is neither string nor int.' );
+            throw new \InvalidArgumentException( '$parameter has to be (String)"Class FQN" or an (int)"Error Number"' );
         }
 
         if ( !array_key_exists( $parameter, $this->listener ) )
