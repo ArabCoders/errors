@@ -118,11 +118,20 @@ class MapTest extends \PHPUnit\Framework\TestCase
     {
         $map = new Map();
 
-        $map->setMessage( 'foo' )->setStructured( [ 'test' => 1 ] )->setTrace( [ 'test' => 2 ] )->clear();
+        $map->setMessage( 'foo' )
+            ->setStructured( [ 'test' => 1 ] )
+            ->setTrace( [ 'test' => 2 ] )
+            ->setType( 1 )
+            ->setError( new ErrorMap( \E_ERROR, 'test', __FILE__, __LINE__ ) )
+            ->setException( new LogicException( 'test' ) )
+            ->clear();
 
         $this->assertEquals( '', $map->getMessage() );
         $this->assertEquals( [], $map->getStructured() );
         $this->assertEquals( [], $map->getTrace() );
+        $this->assertEquals( false, $map->hasException() );
+        $this->assertEquals( false, $map->hasError() );
+        $this->assertEquals( 0, $map->getType() );
     }
 
     public function testGetInstance()

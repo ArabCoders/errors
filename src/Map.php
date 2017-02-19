@@ -261,9 +261,12 @@ class Map implements MapInterface
      */
     public function clear() : MapInterface
     {
-        $this->trace      = [];
-        $this->structured = [];
-        $this->message    = '';
+        $this->trace        = [];
+        $this->structured   = [];
+        $this->message      = '';
+        $this->type         = 0;
+        $this->errorMap     = null;
+        $this->exceptionMap = null;
 
         return $this;
     }
