@@ -179,7 +179,6 @@ class Error implements ErrorInterface
      */
     public function getStructured() : StructuredInterface
     {
-
         return $this->structured;
     }
 
@@ -250,7 +249,7 @@ class Error implements ErrorInterface
      */
     public function handleError( ErrorMapInterface $error ) : ErrorInterface
     {
-        // error was suppressed with the @-operator
+        // check if the error was suppressed with the @-operator and it's not fatal error.
         if ( 0 === error_reporting() && !in_array( $error->getNumber(), self::FATAL_ERRORS ) )
         {
             return $this;
@@ -424,7 +423,6 @@ class Error implements ErrorInterface
      */
     public function deletePolicy( $parameter, string $name ) : ErrorInterface
     {
-
         if ( !array_key_exists( $parameter, $this->policies ) )
         {
             throw new \InvalidArgumentException( sprintf( '(%s) has no registered Policies.', $parameter ) );
@@ -499,7 +497,6 @@ class Error implements ErrorInterface
      */
     protected function display( $parameter ) : ErrorInterface
     {
-
         if ( array_key_exists( $parameter, $this->policies ) )
         {
             foreach ( $this->policies[$parameter] as $policy )
@@ -527,7 +524,6 @@ class Error implements ErrorInterface
      */
     protected function exit( $parameter ) : ErrorInterface
     {
-
         if ( array_key_exists( $parameter, $this->policies ) )
         {
             foreach ( $this->policies[$parameter] as $policy )

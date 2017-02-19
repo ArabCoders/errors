@@ -124,7 +124,7 @@ class Tracer implements TracerInterface
 
             foreach ( $this->ignore as $file )
             {
-                if ( stripos( $file, $trace['file'] ) !== false )
+                if ( false !== stripos( $file, $trace['file'] ) )
                 {
                     continue 2;
                 }

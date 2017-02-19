@@ -70,7 +70,7 @@ class HTML implements OutputInterface
             $structured = '';
         }
 
-        $type = ( $this->getMap()->getType() == ErrorInterface::TYPE_ERROR ) ? 'Error' : 'Exception';
+        $type = ( ErrorInterface::TYPE_ERROR === $this->getMap()->getType() ) ? 'Error' : 'Exception';
 
         print sprintf( $string, $type, $this->escapeString( $this->getMap()->getMessage() ), $structured, $trace );
 

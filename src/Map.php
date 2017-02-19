@@ -81,7 +81,7 @@ class Map implements MapInterface
      */
     public function isError() : bool
     {
-        return $this->getType() === ErrorInterface::TYPE_ERROR;
+        return ErrorInterface::TYPE_ERROR === $this->getType();
     }
 
     /**
@@ -91,7 +91,7 @@ class Map implements MapInterface
      */
     public function isException() : bool
     {
-        return $this->getType() === ErrorInterface::TYPE_EXCEPTION;
+        return ErrorInterface::TYPE_EXCEPTION === $this->getType();
     }
 
     /**

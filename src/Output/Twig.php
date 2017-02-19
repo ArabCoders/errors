@@ -70,7 +70,7 @@ class Twig implements OutputInterface
 
         $structured = $this->getMap()->getStructured();
 
-        if ( $this->getMap()->getType() === ErrorInterface::TYPE_EXCEPTION )
+        if ( ErrorInterface::TYPE_EXCEPTION === $this->getMap()->getType() )
         {
             $class = get_class( $this->getMap()->getException() );
             $type  = ( new \ReflectionClass( $class ) )->getShortName();

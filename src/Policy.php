@@ -64,7 +64,7 @@ class Policy implements PolicyInterface
     {
         if ( !is_string( $parameter ) && !is_int( $parameter ) )
         {
-            throw new \InvalidArgumentException( 'Parameter Type is not string or int.' );
+            throw new \InvalidArgumentException( '$parameter has to be (String)"Class FQN" or an (int)"Error Number"' );
         }
 
         $this->type       = $type;
