@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors;
 
 use arabcoders\errors\Interfaces\ErrorInterface;
@@ -92,13 +93,13 @@ class Structured implements StructuredInterface
     public function process() : StructuredInterface
     {
         $this->structured += [
-            'request' => [
-                'domain' => strtolower( $_SERVER['HTTP_HOST'] ?? 'localhost' ),
+            'request'   => [
+                'domain' => strtolower( $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? null ),
                 'method' => $_SERVER['REQUEST_METHOD'] ?? null,
                 'uri'    => $_SERVER['REQUEST_URI'] ?? $_SERVER['PHP_SELF'] ?? null,
                 'refer'  => $_SERVER['HTTP_REFERER'] ?? null,
             ],
-            'trigger' => [
+            'trigger'   => [
                 'ip'    => $_SERVER['REMOTE_ADDR'] ?? null,
                 'agent' => $_SERVER['HTTP_USER_AGENT']  ?? null,
             ],
