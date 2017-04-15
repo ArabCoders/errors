@@ -86,7 +86,7 @@ class StructuredTest extends \PHPUnit\Framework\TestCase
                 'message' => $e->getMessage(),
             ],
             'request'   => [
-                'domain' => strtolower( $_SERVER['HTTP_HOST'] ?? 'localhost' ),
+                'domain' => strtolower( $_SERVER['HTTP_SERVER'] ?? $_SERVER['HTTP_HOST'] ?? null ),
                 'method' => $_SERVER['REQUEST_METHOD'] ?? null,
                 'uri'    => $_SERVER['REQUEST_URI'] ?? $_SERVER['PHP_SELF'] ?? null,
                 'refer'  => $_SERVER['HTTP_REFERER'] ?? null,

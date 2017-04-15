@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors\Output;
 
 use arabcoders\errors\Interfaces\ErrorInterface;
@@ -42,6 +43,7 @@ class HTML implements OutputInterface
         $string .= '<title>Error Page</title>';
         $string .= '<meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body>';
         $string .= '<h1>An %s has Occurred</h1><blockquote>%s</blockquote>%s%s';
+        $string .= '<h2>Unique Error ID</h2><blockquote>%s</blockquote>';
         $string .= '</body></html>';
 
         if ( $this->getMap()->getTrace() )
@@ -72,7 +74,7 @@ class HTML implements OutputInterface
 
         $type = ( ErrorInterface::TYPE_ERROR === $this->getMap()->getType() ) ? 'Error' : 'Exception';
 
-        print sprintf( $string, $type, $this->escapeString( $this->getMap()->getMessage() ), $structured, $trace );
+        print sprintf( $string, $type, $this->escapeString( $this->getMap()->getMessage() ), $structured, $trace, $this->getMap()->getId() );
 
         return $this;
     }

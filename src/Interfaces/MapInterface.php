@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors\Interfaces;
 
 /**
@@ -61,6 +62,22 @@ interface MapInterface
      * @return array
      */
     public function getTrace() : array;
+
+    /**
+     * Set Unique Id for error.
+     *
+     * @param string $id
+     *
+     * @return MapInterface
+     */
+    public function setId( string $id ) : MapInterface;
+
+    /**
+     * Get Unique Error Id.
+     *
+     * @return string
+     */
+    public function getId() : string;
 
     /**
      * Set message.

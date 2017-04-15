@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors\Output;
 
 use arabcoders\errors\Interfaces\ErrorInterface;
@@ -80,6 +81,7 @@ class Twig implements OutputInterface
             'className'  => $type ?? null,
             'type'       => $this->getMap()->getType(),
             'message'    => $this->getMap()->getMessage(),
+            'UNIQUE_ID'  => $this->getMap()->getId(),
             'trace'      => ( !empty( $trace ) ) ? json_encode( $trace, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
             'structured' => ( !empty( $structured ) ) ? json_encode( $structured, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
         ] );

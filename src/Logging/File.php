@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors\Logging;
 
 use arabcoders\errors\Interfaces\MapInterface;
@@ -48,7 +49,7 @@ class File implements LoggingInterface
      */
     public function process() : LoggingInterface
     {
-        $message = trim( '[' . gmdate( \DateTime::W3C ) . '] ' . $this->getMap()->getMessage() );
+        $message = trim( '[' . gmdate( \DateTime::W3C ) . '][' . $this->getMap()->getId() . '] ' . $this->getMap()->getMessage() );
         $trace   = $this->getMap()->getTrace();
 
         if ( $trace )

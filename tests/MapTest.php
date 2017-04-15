@@ -189,4 +189,25 @@ class MapTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf( \Throwable::class, $map->getException() );
     }
 
+    public function testSetId()
+    {
+        $map = new Map();
+
+        $this->assertEquals( $map, $map->setId( sha1( random_bytes( 16 ) ) ) );
+
+        $this->expectException( \TypeError::class );
+
+        $map->setMessage( [] );
+    }
+
+    public function testGetId()
+    {
+        $map = new Map();
+
+        $id = sha1( random_bytes( 16 ) );
+
+        $this->assertEquals( '', $map->getId() );
+        $this->assertEquals( $id, $map->setId( $id )->getId() );
+    }
+
 }

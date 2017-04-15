@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors\Logging;
 
 use arabcoders\errors\Interfaces\ErrorInterface;
@@ -80,6 +81,11 @@ class Syslog implements LoggingInterface
         }
 
         $message = $this->getMap()->getMessage();
+
+        if ( $this->getMap()->getId() )
+        {
+            $message .= ' REF [ ' . $this->getMap()->getId() . ' ]';
+        }
 
         if ( $this->getMap()->getStructured() )
         {

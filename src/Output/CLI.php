@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors\Output;
 
 use arabcoders\errors\Interfaces\MapInterface;
@@ -36,7 +37,16 @@ class CLI implements OutputInterface
             define( 'STDERR', fopen( 'php://stderr', 'w' ) );
         }
 
-        fwrite( STDERR, $this->getMap()->getMessage() . PHP_EOL );
+        $message = $this->getMap()->getMessage();
+
+        if ( $this->getMap()->getId() )
+        {
+            $message .= sprintf( ' - REF [ %s ]', $this->getMap()->getId() );
+        }
+
+        $message .= PHP_EOL;
+
+        fwrite( STDERR, $message );
 
         return $this;
     }

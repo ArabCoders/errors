@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors;
 
 use arabcoders\errors\Interfaces\ErrorInterface;
@@ -34,6 +35,11 @@ class Map implements MapInterface
      * @var string Error message.
      */
     protected $message = '';
+
+    /**
+     * @var string Unique Error id.
+     */
+    protected $id = '';
 
     /**
      * @var int Error type {@see ErrorInterface::TYPE_ERROR} or {@see ErrorInterface::TYPE_EXCEPTION}
@@ -116,6 +122,30 @@ class Map implements MapInterface
     public function getTrace() : array
     {
         return $this->trace;
+    }
+
+    /**
+     * Set Unique Id for error.
+     *
+     * @param string $id
+     *
+     * @return MapInterface
+     */
+    public function setId( string $id ) : MapInterface
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get Unique Error Id.
+     *
+     * @return string
+     */
+    public function getId() : string
+    {
+        return $this->id;
     }
 
     /**
@@ -264,6 +294,7 @@ class Map implements MapInterface
         $this->trace        = [];
         $this->structured   = [];
         $this->message      = '';
+        $this->id           = '';
         $this->type         = 0;
         $this->errorMap     = null;
         $this->exceptionMap = null;

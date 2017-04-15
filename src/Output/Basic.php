@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors\Output;
 
 use arabcoders\errors\Interfaces\MapInterface;
@@ -42,6 +43,11 @@ class Basic implements OutputInterface
         }
 
         print self::MSG;
+
+        if ( $this->getMap()->getId() )
+        {
+            echo PHP_EOL . sprintf( 'Unique Error Id: %s', $this->getMap()->getId() );
+        }
 
         return $this;
     }

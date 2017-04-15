@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace arabcoders\errors;
 
 use arabcoders\errors\Interfaces\ErrorInterface;
@@ -262,6 +263,7 @@ class Error implements ErrorInterface
              ->setTrace( $this->tracer->setIgnore( [ __FILE__ ] )->process()->getTrace() )
              ->setMessage( $this->formatter->formatError( $error ) )
              ->setError( $error )
+             ->setId( $this->createUUID() )
              ->getInstance();
 
         if ( array_key_exists( $error->getNumber(), $this->listener ) )
@@ -292,6 +294,7 @@ class Error implements ErrorInterface
              ->setStructured( $this->getStructured()->setException( $exception )->process()->getStructured() )
              ->setTrace( $this->tracer->setContext( $exception->getTrace() )->setIgnore( [ __FILE__ ] )->process()->getTrace() )
              ->setMessage( $this->formatter->formatException( $exception ) )
+             ->setId( $this->createUUID() )
              ->getInstance();
 
         $name = get_class( $exception );
@@ -551,4 +554,34 @@ class Error implements ErrorInterface
         return $this;
     }
 
+    /**
+     * Creates Universal Unique Identifier For Error.
+     *
+     * Implements UUIDv4.
+     *
+     * @return string
+     */
+    protected function createUUID() : string
+    {
+        $version = 4;
+
+        $hash = bin2hex( random_bytes( 16 ) );
+
+        return sprintf(
+            '%08s-%04s-%04x-%04x-%12s',
+            // 32 bits for "time_low"
+            substr( $hash, 0, 8 ),
+            // 16 bits for "time_mid"
+            substr( $hash, 8, 4 ),
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number
+            ( hexdec( substr( $hash, 12, 4 ) ) & 0x0fff ) | $version << 12,
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            ( hexdec( substr( $hash, 16, 4 ) ) & 0x3fff ) | 0x8000,
+            // 48 bits for "node"
+            substr( $hash, 20, 12 )
+        );
+    }
 }
