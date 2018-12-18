@@ -6,13 +6,14 @@
         "errors",
         "exception",
         "exceptions",
-        "logging"
+        "logging",
+        "psr3"
     ],
     "homepage": "https://www.abdulmohsen.me",
     "license": "MIT",
     "authors": [
         {
-            "name": "AbdulMohsen B. A. A.",
+            "name": "Abdulmohsen B. A. A.",
             "email": "admin@arabcoders.org"
         }
     ],
@@ -21,8 +22,9 @@
         "twig/twig": "For Twig output."
     },
     "require": {
-        "php": ">=7.0",
-        "ext-json": "*"
+        "php": ">=7.2",
+        "ext-json": "*",
+        "psr/log": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0",

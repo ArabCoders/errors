@@ -28,7 +28,7 @@ class Basic implements OutputInterface
     /**
      * @var string Basic message to display.
      */
-    const MSG = '500 Internal Server Error';
+    public const MSG = '500 Internal Server Error';
 
     /**
      * Set Header and display Message.

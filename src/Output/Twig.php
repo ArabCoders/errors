@@ -64,6 +64,10 @@ class Twig implements OutputInterface
      * ```
      *
      * @return OutputInterface
+     * @throws \ReflectionException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
      */
     public function display() : OutputInterface
     {
@@ -82,8 +86,8 @@ class Twig implements OutputInterface
             'type'       => $this->getMap()->getType(),
             'message'    => $this->getMap()->getMessage(),
             'UNIQUE_ID'  => $this->getMap()->getId(),
-            'trace'      => ( !empty( $trace ) ) ? json_encode( $trace, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
-            'structured' => ( !empty( $structured ) ) ? json_encode( $structured, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
+            'trace'      => !empty( $trace ) ? json_encode( $trace, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
+            'structured' => !empty( $structured ) ? json_encode( $structured, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) : null,
         ] );
 
         return $this;

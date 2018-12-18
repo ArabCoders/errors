@@ -97,7 +97,7 @@ class Syslog implements LoggingInterface
             $message .= PHP_EOL . print_r( $this->getMap()->getTrace(), true );
         }
 
-        if ( $this->getMap()->getType() == ErrorInterface::TYPE_EXCEPTION )
+        if ( ErrorInterface::TYPE_EXCEPTION === $this->getMap()->getType() )
         {
             $logType = \LOG_ERR;
         }

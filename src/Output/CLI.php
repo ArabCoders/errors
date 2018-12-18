@@ -34,7 +34,7 @@ class CLI implements OutputInterface
     {
         if ( !is_resource( STDERR ) )
         {
-            define( 'STDERR', fopen( 'php://stderr', 'w' ) );
+            define( 'STDERR', fopen( 'php://stderr', 'wb' ) );
         }
 
         $message = $this->getMap()->getMessage();

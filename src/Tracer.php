@@ -113,7 +113,7 @@ class Tracer implements TracerInterface
             $tracer = $e->getTrace();
         }
 
-        $path = ( $this->getRoot() ) ? realpath( $this->getRoot() ) : '';
+        $path = $this->getRoot() ? realpath( $this->getRoot() ) : '';
 
         foreach ( $tracer as $number => $trace )
         {
@@ -161,13 +161,13 @@ class Tracer implements TracerInterface
                 }
             }
 
-            $trace['class'] = ( empty( $trace['class'] ) ) ? '' : $trace['class'];
-            $trace['type']  = ( empty( $trace['type'] ) ) ? '' : $trace['type'];
+            $trace['class'] = empty( $trace['class'] ) ? '' : $trace['class'];
+            $trace['type']  = empty( $trace['type'] ) ? '' : $trace['type'];
 
             $this->trace[] = [
                 'file' => $trace['file'],
                 'line' => $trace['line'],
-                'call' => $trace['class'] . $trace['type'] . $trace['function'] . '(' . ( ( sizeof( $args ) ) ? implode( ', ', $args ) : '' ) . ');',
+                'call' => $trace['class'] . $trace['type'] . $trace['function'] . '(' . ( count( $args ) ? implode( ', ', $args ) : '' ) . ');',
             ];
         }
 

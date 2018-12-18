@@ -214,16 +214,14 @@ class Error implements ErrorInterface
      */
     public function register() : ErrorInterface
     {
-        set_error_handler( function ( int $number, string $text, string $file, int $line )
-        {
+        set_error_handler( function ( int $number, string $text, string $file, int $line ) {
             $this->handleError( new ErrorMap( $number, $text, $file, $line ) );
         } );
 
-        register_shutdown_function( function ()
-        {
+        register_shutdown_function( function () {
             $error = error_get_last();
 
-            if ( null == $error || !in_array( $error['type'], self::FATAL_ERRORS ) )
+            if ( null == $error || !in_array( $error['type'], self::FATAL_ERRORS, true ) )
             {
                 return;
             }
@@ -233,8 +231,7 @@ class Error implements ErrorInterface
             );
         } );
 
-        set_exception_handler( function ( \Throwable $exception )
-        {
+        set_exception_handler( function ( \Throwable $exception ) {
             $this->handleException( $exception );
         } );
 
@@ -251,7 +248,7 @@ class Error implements ErrorInterface
     public function handleError( ErrorMapInterface $error ) : ErrorInterface
     {
         // check if the error was suppressed with the @-operator and it's not fatal error.
-        if ( 0 === error_reporting() && !in_array( $error->getNumber(), self::FATAL_ERRORS ) )
+        if ( 0 === error_reporting() && !in_array( $error->getNumber(), self::FATAL_ERRORS, true ) )
         {
             return $this;
         }
@@ -444,7 +441,7 @@ class Error implements ErrorInterface
     /**
      * Handle Logging, displaying and exiting of the program.
      */
-    protected function handleState()
+    protected function handleState() : void
     {
         if ( $this->getMap()->getType() === self::TYPE_ERROR )
         {

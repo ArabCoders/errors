@@ -39,8 +39,8 @@ class HTML implements OutputInterface
             header( 'Content-Type: text/html; charset=utf-8' );
         }
 
-        $string = '<!DOCTYPE html><html><head><meta charset="utf-8">';
-        $string .= '<title>Error Page</title>';
+        $string = '<!DOCTYPE html><html lang="en">';
+        $string .= '<head><meta charset="utf-8"><title>Error Page</title>';
         $string .= '<meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body>';
         $string .= '<h1>An %s has Occurred</h1><blockquote>%s</blockquote>%s%s';
         $string .= '<h2>Unique Error ID</h2><blockquote>%s</blockquote>';

@@ -22,17 +22,17 @@ interface ErrorInterface
     /**
      * @var int Type error.
      */
-    const TYPE_ERROR = 0;
+    public const TYPE_ERROR = 0;
 
     /**
      * @var int Type exception.
      */
-    const TYPE_EXCEPTION = 1;
+    public const TYPE_EXCEPTION = 1;
 
     /**
      * @var array All PHP core errors.
      */
-    const ERROR_CODES = [
+    public const ERROR_CODES = [
         E_ERROR             => 'E_ERROR',
         E_WARNING           => 'E_WARNING',
         E_PARSE             => 'E_PARSE',
@@ -53,7 +53,7 @@ interface ErrorInterface
     /**
      * @var array Fatal errors
      */
-    const FATAL_ERRORS = [
+    public const FATAL_ERRORS = [
         E_ERROR,
         E_PARSE,
         E_CORE_ERROR,

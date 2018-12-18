@@ -9,6 +9,9 @@ in different way, or want to extend/replace the Structured data,
 It can log to multiple services defined by the user, it can also handle different output streams, 
 there is also Policy class to handle Different requirement of logging/displaying/exiting of the application. 
 
+Im working to support Psr3 there is minimal support right now with Logger Class and PSR3 abstract class,
+we may have to refactor major parts to be compatiable with it.
+
 ## Install
 
 Via Composer
