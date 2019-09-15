@@ -5,12 +5,12 @@ use arabcoders\errors\Policy;
 class PolicyClosureTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Policy
+     * @var PolicyTest
      */
     private static $hasClosure;
 
     /**
-     * @var Policy
+     * @var PolicyTest
      */
     private static $noClosure;
 

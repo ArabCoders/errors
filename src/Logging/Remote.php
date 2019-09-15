@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of ( \arabcoders\errors ) project.
+ * This file is part of ( @package \arabcoders\errors ) project.
  *
  * (c) 2017 ArabCoders Ltd.
  *

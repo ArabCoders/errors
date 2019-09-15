@@ -123,20 +123,20 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
 
     public function testAddListenerException()
     {
-        $this->assertEquals( self::$i, self::$i->addListener( PDOException::class, 'PDO', new Listener() ) );
+        $this->assertEquals( self::$i, self::$i->addListener( PDOException::class, 'PDO', new ListenerTest() ) );
     }
 
     public function testAddListenerError()
     {
-        $this->assertEquals( self::$i, self::$i->addListener( ErrorInterface::FATAL_ERRORS[\E_ERROR], 'E-Error', new Listener() ) );
+        $this->assertEquals( self::$i, self::$i->addListener( ErrorInterface::FATAL_ERRORS[\E_ERROR], 'E-Error', new ListenerTest() ) );
     }
 
     public function testListenerBeingCalled()
     {
-        $listener = new Listener();
+        $listener = new ListenerTest();
 
         self::$i->addListener( LogicException::class, 'PDO', $listener );
-        self::$i->setOutput( new nullOutput() );
+        self::$i->setOutput( new nullOutputTest() );
         self::$i->addPolicy(
             LogicException::class,
             new \arabcoders\errors\Policy( ErrorInterface::TYPE_EXCEPTION, LogicException::class, false, false, false )
@@ -158,21 +158,21 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException( InvalidArgumentException::class );
 
-        self::$i->addListener( LogicException::class, 'foo', new Listener() );
+        self::$i->addListener( LogicException::class, 'foo', new ListenerTest() );
 
         self::$i->deleteListener( LogicException::class, 'bar' );
     }
 
     public function testDeleteSpecialCase()
     {
-        self::$i->addListener( LogicException::class, 'foo', new Listener() );
+        self::$i->addListener( LogicException::class, 'foo', new ListenerTest() );
 
         $this->assertEquals( self::$i, self::$i->deleteListener( LogicException::class, 'foo' ) );
     }
 
     public function testAddLoggerSuccess()
     {
-        $this->assertEquals( self::$i, self::$i->addLogger( 'logger', new Logger() ) );
+        $this->assertEquals( self::$i, self::$i->addLogger( 'logger', new LoggerTest() ) );
     }
 
     public function testAddLoggerFail()
@@ -184,7 +184,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteLoggerSuccess()
     {
-        $this->assertEquals( self::$i, self::$i->addLogger( 'logger', new Logger() ) );
+        $this->assertEquals( self::$i, self::$i->addLogger( 'logger', new LoggerTest() ) );
     }
 
     public function testDeleteLoggerFail()
@@ -196,10 +196,10 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
 
     public function testLoggerBeingCalled()
     {
-        $logger = new Logger();
+        $logger = new LoggerTest();
 
-        self::$i->addLogger( Logger::class, $logger );
-        self::$i->setOutput( new nullOutput() );
+        self::$i->addLogger( LoggerTest::class, $logger );
+        self::$i->setOutput( new nullOutputTest() );
         self::$i->addPolicy(
             LogicException::class,
             new \arabcoders\errors\Policy( ErrorInterface::TYPE_EXCEPTION, LogicException::class, true, false, false )
@@ -216,7 +216,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals( self::$i,
                              self::$i->addPolicy(
                                  LogicException::class,
-                                 new Policy( ErrorInterface::TYPE_EXCEPTION, LogicException::class, false, false, false ) )
+                                 new PolicyTest( ErrorInterface::TYPE_EXCEPTION, LogicException::class, false, false, false ) )
         );
 
     }
@@ -241,7 +241,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage( sprintf( '(%s) has no registered Policy of name (%s).', LogicException::class, 'bar' ) );
 
         self::$i->addPolicy( LogicException::class,
-                             new Policy( ErrorInterface::TYPE_EXCEPTION, LogicException::class, false, false, false )
+                             new PolicyTest( ErrorInterface::TYPE_EXCEPTION, LogicException::class, false, false, false )
         );
 
         self::$i->deletePolicy( LogicException::class, 'bar' );
@@ -249,9 +249,9 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
 
     public function testPolicyBeingCalled()
     {
-        self::$i->setOutput( new nullOutput() )
-                ->addPolicy( LogicException::class, new Policy( ErrorInterface::TYPE_EXCEPTION, LogicException::class, false, false, false ) )
-                ->addPolicy( InvalidArgumentException::class, new Policy( ErrorInterface::TYPE_EXCEPTION, InvalidArgumentException::class, true, true, false ) );
+        self::$i->setOutput( new nullOutputTest() )
+                ->addPolicy( LogicException::class, new PolicyTest( ErrorInterface::TYPE_EXCEPTION, LogicException::class, false, false, false ) )
+                ->addPolicy( InvalidArgumentException::class, new PolicyTest( ErrorInterface::TYPE_EXCEPTION, InvalidArgumentException::class, true, true, false ) );
 
         try
         {
@@ -273,7 +273,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
     }
 }
 
-class Logger implements LoggingInterface
+class LoggerTest implements LoggingInterface
 {
     private $map;
 
@@ -307,7 +307,7 @@ class Logger implements LoggingInterface
     }
 }
 
-class Listener implements ListenerInterface
+class ListenerTest implements ListenerInterface
 {
     private $map;
 
@@ -331,7 +331,7 @@ class Listener implements ListenerInterface
     }
 }
 
-class Policy implements PolicyInterface
+class PolicyTest implements PolicyInterface
 {
     /**
      * @var int
@@ -409,7 +409,7 @@ class Policy implements PolicyInterface
     }
 }
 
-class nullOutput implements OutputInterface
+class nullOutputTest implements OutputInterface
 {
     private $map;
 

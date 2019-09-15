@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of ( \arabcoders\errors ) project.
+ * This file is part of ( @package \arabcoders\errors ) project.
  *
  * (c) 2017 ArabCoders Ltd.
  *
@@ -551,13 +551,6 @@ class Error implements ErrorInterface
         return $this;
     }
 
-    /**
-     * Creates Universal Unique Identifier For Error.
-     *
-     * Implements UUIDv4.
-     *
-     * @return string
-     */
     protected function createUUID() : string
     {
         $version = 4;
